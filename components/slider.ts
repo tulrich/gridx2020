@@ -75,6 +75,9 @@ export class Slider {
   _scale: string[];
   _currentValue: number;
   _currentValueElement: HTMLElement;
+  _defaultValue: number;
+  _tab: HTMLElement;
+  _panel: Element;
 
   /**
    * Constructor.
@@ -95,6 +98,13 @@ export class Slider {
     this._container = container;
     this._range = null;
     this._onChangeCallbacks = [];
+    this._defaultValue = initialValue;
+
+    this._panel = this._container.closest('.mdl-tabs__panel');
+    if (this._panel) {
+      let idval = this._panel.id;
+      this._tab = document.querySelector(`a.mdl-tabs__tab[href='#${idval}']`);
+    }
 
     if (scaleDisplayValues) {
       // Sanity check that the scale has the same number of stops as the slider.
@@ -107,6 +117,14 @@ export class Slider {
     this._scale = scaleDisplayValues;
     this._currentValue = initialValue;
     this._build(min, max, step, initialValue);
+  }
+
+  setDefaultValue(newDefault: number) {
+    this._defaultValue = newDefault;
+  }
+
+  getDefaultValue(): number {
+    return this._defaultValue;
   }
 
   /**
@@ -125,10 +143,37 @@ export class Slider {
    * @param value The new value for the slider.
    */
   setValue(value: number) {
+    this.setValueNoNotify(value);
+    this._notifyListeners(value);
+  }
+
+  setValueNoNotify(value: number) {
     this._range.MaterialSlider.change(value);
     this._currentValue = value;
     this._currentValueElement.textContent = this._scale[this._currentValue];
-    this._notifyListeners(value);
+  }
+
+  colorIfChanged() {
+    if (this._currentValue > this._defaultValue) {
+      this._currentValueElement.classList.add('higher');
+      this._currentValueElement.classList.remove('lower');
+    } else if (this._currentValue < this._defaultValue) {
+      this._currentValueElement.classList.add('lower');
+      this._currentValueElement.classList.remove('higher');
+    } else {
+      this._currentValueElement.classList.remove('lower');
+      this._currentValueElement.classList.remove('higher');
+    }
+
+    // Annotate the tab.
+    if (this._tab) {
+      let sliders = this._panel.querySelectorAll('.slider-current-value.higher,.slider-current-value.lower');
+      if (sliders.length) {
+        this._tab.classList.add('changed');
+      } else {
+        this._tab.classList.remove('changed');
+      }
+    }
   }
 
   /**
@@ -202,6 +247,10 @@ export class Slider {
     // when it's "dropped").
     range.onchange = throttledChangeHandler;
     range.oninput = throttledChangeHandler;
+    range.ondblclick = util.animate(() => {}, () => {
+        this.setValue(this._defaultValue);
+        this.colorIfChanged();
+      });
 
     this._range = <any> range;
     const labelContainer = document.createElement('div');

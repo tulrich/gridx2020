@@ -27,36 +27,50 @@ export function initAppendixLinks() {
       ],
       button: document.getElementById('go-to-about-appendix-button')
     },
-    details: {
-      links: [
-        document.getElementById('title-details-appendix'),
-        document.getElementById('cost-slider-about-appendix'),
-      ],
-      button: document.getElementById('go-to-details-appendix-button')
-    },
-    data: {
-      links: [
-        document.getElementById('title-data-appendix')
-      ],
-      button: document.getElementById('go-to-data-appendix-button')
-    },
-    code: {
-      links: [
-        document.getElementById('title-code-appendix'),
-      ],
-      button: document.getElementById('go-to-code-appendix-button')
-    },
+//    details: {
+//      links: [
+//        document.getElementById('title-details-appendix'),
+//        document.getElementById('cost-slider-about-appendix'),
+//      ],
+//      button: document.getElementById('go-to-details-appendix-button')
+//    },
+//     data: {
+//       links: [
+//         document.getElementById('title-data-appendix')
+//       ],
+//       button: document.getElementById('go-to-data-appendix-button')
+//     },
+//    code: {
+//      links: [
+//        document.getElementById('title-code-appendix'),
+//      ],
+//      button: document.getElementById('go-to-code-appendix-button')
+//    },
   };
 
   // Configure appendix link behavior to trigger the modal content switch
   // via MDL tabs when clicked.
-  Object.keys(appendixLinks).forEach(page => {
-    const {links, button} = appendixLinks[page];
-    links.forEach(link => {
-      link.onclick = (event: Event) => {
-        event.preventDefault();
-        button.click();
-      };
-    })
-  });
+  let modelSection = document.getElementById('utility-mode');
+  let aboutSection = document.getElementById('about-appendix');
+
+  document.getElementById('title-model').onclick = (event: Event) => {
+    event.preventDefault();
+    aboutSection.classList.add('hidden');
+    modelSection.classList.remove('hidden');
+  };
+  document.getElementById('title-about-appendix').onclick = (event: Event) => {
+    event.preventDefault();
+    modelSection.classList.add('hidden');
+    aboutSection.classList.remove('hidden');
+  };
+
+//   Object.keys(appendixLinks).forEach(page => {
+//     const {links, button} = appendixLinks[page];
+//     links.forEach(link => {
+//       link.onclick = (event: Event) => {
+//         event.preventDefault();
+//         button.click();
+//       };
+//     })
+//   });
 }

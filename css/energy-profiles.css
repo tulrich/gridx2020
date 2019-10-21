@@ -59,6 +59,18 @@ limitations under the License.
   stroke: black;
 }
 
+.energy-profiles-chart .co2-curve-line {
+  fill: none;
+  stroke-width: 2;
+  stroke: #202020;
+}
+
+.energy-profiles-chart .spend-curve-line {
+  fill: none;
+  stroke-width: 2;
+  stroke: #00962d;
+}
+
 .energy-profiles-chart .interest-marker-label {
   font-size: 10pt;
   fill: rgba(0, 0, 0, .37);

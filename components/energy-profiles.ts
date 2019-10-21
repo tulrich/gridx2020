@@ -18,6 +18,8 @@ limitations under the License.
 import * as style from '../style';
 import * as util from '../util';
 
+const TONS_PER_MONTH_TO_MT_PER_YEAR = 12 / 1e6;
+
 /**
  * Energy supply and demand chart configuration options.
  */
@@ -32,7 +34,10 @@ interface ChartOptions {
   colors?: {[s: string]: string}
   transition?: {delay?: number, duration?: number},
   patterns?: {[s: string]: string},
-  stackingOrder?: UtilityEnergySource[],
+  stackingOrder?: ProfileSeries[],
+  profileLines?: ProfileSeries[],
+  useHighlightProfiles?: boolean;
+  useCo2Profiles?: boolean;
 }
 
 /**
@@ -40,8 +45,8 @@ interface ChartOptions {
  */
 const DEFAULT_CONFIG: ChartOptions = {
   size: {width: 760, height: 330},
-  padding: {top: 5, left: 50, bottom: 30, right: 0},
-  labels: {yAxis: 'Power (Gigawatts)', excessMarker: 'Excess'},
+  padding: {top: 5, left: 50, bottom: 20, right: 50},  // 30
+  labels: {yAxis: 'Power (GW)', excessMarker: 'Excess'},
   layout: {
     markers: {labelYOffset: -12, labelYGap: -6, labelMaxYValue: 28000}
   },
@@ -50,29 +55,44 @@ const DEFAULT_CONFIG: ChartOptions = {
     solar: style.COLORS.SOLAR_LIGHT,
     wind: style.COLORS.WIND,
     nuclear: style.COLORS.NUCLEAR,
+    hydro: style.COLORS.HYDRO,
     ng: style.COLORS.NG,
     ngccs: style.COLORS.NGCCS,
     coal: style.COLORS.COAL,
     coalccs: style.COLORS.COALCCS,
+    battery: style.COLORS.BATTERY,
+    h2: style.COLORS.H2,
     demand: style.COLORS.DEMAND,
     excess: style.COLORS.EXCESS,
     patternBackground: style.COLORS.EXCESS_LIGHT,
     markers: '#ccc',
+    co2: style.COLORS.CO2,
+    spend: style.COLORS.SPEND,
   },
   transition: {delay: 50, duration: 100},
   patterns: {
     solar: 'solar-consumed',
     wind: 'wind-consumed',
+    hydro: 'hydro-consumed',
     nuclear: 'nuclear-consumed',
     ng: 'ng-consumed',
     ngccs: 'ngccs-consumed',
     coal: 'coal-consumed',
     coalccs: 'coalccs-consumed',
+    battery: 'battery-consumed',
+    h2: 'h2-consumed',
     demand: 'demand-primary',
     excess: 'excess-primary',
+    co2: 'co2-produced',
+    spend: 'spend-consumed',
   },
-  stackingOrder: ['coal', 'coalccs', 'nuclear', 'solar', 'wind', 'ng', 'ngccs'],
+  stackingOrder: ['coal', /*'coalccs',*/ 'nuclear', 'hydro', 'solar', 'wind', 'ng', /*'ngccs',*/ 'battery', 'h2'],
+  useHighlightProfiles: false,
+  useCo2Profiles: false,
 };
+
+
+let prefixNumber = 0;
 
 /**
  * Chart that renders energy supply and demand over time.
@@ -87,6 +107,8 @@ export class SupplyDemandProfilesChart implements UtilityDataComponent {
   _timeScale: d3.time.Scale<number, number>;
   _xAxisGenerator: d3.svg.Axis;
   _yAxisGenerator: d3.svg.Axis;
+  _xAxisLayer: any;
+  _yAxisLayer: any;
 
   // Energy demand elements.
   _demandPathGenerator: d3.svg.Area<PowerSample>;
@@ -104,6 +126,12 @@ export class SupplyDemandProfilesChart implements UtilityDataComponent {
   _consumedLayer: d3.Selection<LinePoint>;
   _consumedBorder: d3.Selection<LinePoint>;
 
+  _co2Layer: d3.Selection<LinePoint>;
+  _co2Line: d3.Selection<LinePoint>;
+
+  _spendLayer: d3.Selection<LinePoint>;
+  _spendLine: d3.Selection<LinePoint>;
+
   // Excess energy generation elements (subset of supplied energy).
   _excessPathGenerator: d3.svg.Area<AreaSpan>;
   _excessLayer: d3.Selection<AreaSpan>;
@@ -111,6 +139,8 @@ export class SupplyDemandProfilesChart implements UtilityDataComponent {
   _excessBorderPathGenerator: d3.svg.Line<AreaSpan>;
   _excessBorder: d3.Selection<AreaSpan>;
   _excessMarkerLayer: d3.Selection<AreaSpan>;
+
+  _prefix: string;
 
   /**
    * Constructor.
@@ -127,6 +157,9 @@ export class SupplyDemandProfilesChart implements UtilityDataComponent {
     this._container = container;
     this._config = {};
 
+    this._prefix = `p${prefixNumber}-`;
+    prefixNumber++;
+
     this._build(view, configOverrides);
   }
 
@@ -138,39 +171,56 @@ export class SupplyDemandProfilesChart implements UtilityDataComponent {
   update(view: UtilityDataView) {
     // Update energy generation supply profiles.
     const unstackedLayoutData = getUnstackedSupplyLayout(
-        view, this._config.stackingOrder);
-    const stackedLayoutData = this._supplyRegionLayout(unstackedLayoutData)
+        this._getProfiles(view), this._config.stackingOrder);
+    const stackedLayoutData = this._supplyRegionLayout(unstackedLayoutData);
 
-    const supplyRegions = this._supplyLayer
+    if (this._config.profileLines) {
+      //xxx redundant this.configureCo2Scale(view);
+      const co2Series = getCo2Layout(this._getProfiles(view));
+      const co2Line = this._co2Line
+	.datum(co2Series)
+        .attr('d', this._consumedPathGenerator);
+    } else {
+      const supplyRegions = this._supplyLayer
         .selectAll('path')
-        .data(stackedLayoutData)
-    supplyRegions.enter()
+	.data(stackedLayoutData);
+      supplyRegions.enter()
         .append('path')
         .classed('supply-area', true);
-    const fills = this._config.stackingOrder
-        .map(s => `url(#${this._config.patterns[s]})`);
-    supplyRegions
+      const fills = this._config.stackingOrder
+        .map(s => `url(#${this._prefix}${this._config.patterns[s]})`);
+      supplyRegions
         .attr('fill', (d, i) => fills[i])
         .attr('d', this._supplyPathGenerator);
 
-    // Update excess energy generation profile.
-    const excessSeries = getExcessLayout(view);
-    this._excessRegion
+      // Update excess energy generation profile.
+      const excessSeries = getExcessLayout(this._getProfiles(view));
+      this._excessRegion
         .datum(excessSeries)
-        .attr('fill', `url(#${this._config.patterns.excess})`)
+        .attr('fill', `url(#${this._prefix}${this._config.patterns.excess})`)
         .attr('d', this._excessPathGenerator);
-    this._excessBorder
+      this._excessBorder
         .datum(excessSeries)
         .attr('d', this._excessBorderPathGenerator);
 
-    // Update consumed energy profile.
-    const consumedSeries = getConsumedLayout(view);
-    this._consumedBorder
+      // Update consumed energy profile.
+      const consumedSeries = getConsumedLayout(this._getProfiles(view));
+      this._consumedBorder
         .datum(consumedSeries)
         .attr('d', this._consumedPathGenerator);
 
+      // Update energy demand profile.
+      const demandSeries = _getDemandSeries(this._getProfiles(view));
+      this._demandRegion
+        .datum(demandSeries)
+        .attr('d', this._demandPathGenerator);
+      this._demandBorder
+        .datum(demandSeries)
+        .attr('d', this._demandBorderPathGenerator);
+    }
+
     // Update points-of-interest markers.
-    const markerPoints = this._getInterestMarkersLayout(view);
+    const markerPoints = this._getInterestMarkersLayout(this._getProfiles(view));
     // Text label for each marker.
     const labels = this._excessMarkerLayer
         .selectAll('.interest-marker-label')
@@ -196,15 +246,6 @@ export class SupplyDemandProfilesChart implements UtilityDataComponent {
         .attr('x2', d => d.x)
         .attr('y2', d => d.labelYOffset)
         .style('stroke', d => d.color);
-
-    // Update energy demand profile.
-    const demandSeries = _getDemandSeries(view);
-    this._demandRegion
-        .datum(demandSeries)
-        .attr('d', this._demandPathGenerator);
-    this._demandBorder
-        .datum(demandSeries)
-        .attr('d', this._demandBorderPathGenerator);
   }
 
   /**
@@ -217,7 +258,7 @@ export class SupplyDemandProfilesChart implements UtilityDataComponent {
     // Configure chart properties.
     util.mergeDeep(DEFAULT_CONFIG, this._config);
     util.mergeDeep(configOverrides, this._config);
-    this._configureLayout(view);
+    this.configureLayout(view);
     this._configureGenerators();
 
     // Get the region of the chart that will correspond to the data axes.
@@ -229,12 +270,18 @@ export class SupplyDemandProfilesChart implements UtilityDataComponent {
     this.update(view);
   }
 
+  configureCo2Scale(view: UtilityDataView) {
+    const co2Series = getCo2Layout(this._getProfiles(view));
+    const series = co2Series.map(d => d.y);
+    this._powerScale.domain([Math.min(0, d3.min(series)), Math.max(10, d3.max(series))]);
+  }
+
   /**
    * Configures the visual layout of the chart.
    *
    * @param view The data view used for deriving scale extents.
    */
-  _configureLayout(view: UtilityDataView) {
+  configureLayout(view: UtilityDataView) {
     this._transition = d3.transition()
         .delay(this._config.transition.delay)
         .duration(this._config.transition.duration);
@@ -246,27 +293,61 @@ export class SupplyDemandProfilesChart implements UtilityDataComponent {
         .range([this._config.size.height, 0]);
 
     // Configure the domains for the scales according to the energy demand.
-    const demandSeries = _getDemandSeries(view);
+    const demandSeries = _getDemandSeries(this._getProfiles(view));
     // Get the min/max time points.
     this._timeScale.domain(
         d3.extent(demandSeries.map(d => d.timestamp)));
-    // Scale from 0% to 100% of peak demand
-    this._powerScale.domain(
-        [0, d3.max(demandSeries.map(d => d.power))]);
+    if (this._config.profileLines) {
+      this.configureCo2Scale(view);
+    } else {
+      // Scale from 0% to 100% of peak demand
+      this._powerScale.domain(
+			      [0, d3.max(demandSeries.map(d => d.power))]);
+    }
 
     // Axis configuration.
-    const xTicks = _getTimeScaleTicks(demandSeries.map(d => d.timestamp));
+    const shortScale = (demandSeries[demandSeries.length - 1].timestamp.getTime() - demandSeries[0].timestamp.getTime())
+      < 1000 * 60 * 60 * 24 * 365;
+    const xTicks = _getTimeScaleTicks(demandSeries.map(d => d.timestamp), shortScale);
     this._xAxisGenerator = d3.svg.axis()
         .scale(this._timeScale)
         .orient('bottom')
-        .tickFormat(d3.time.format('%A'))
+      .tickFormat(shortScale ? d3.time.format('%Y/%m/%d') : d3.time.format('%Y'))
         .tickValues(xTicks);
-    const yTicks = _getPowerScaleTicks(view.profiles.series.demand);
-    this._yAxisGenerator = d3.svg.axis()
+    this._rescaleYAxis(view);
+
+    if (this._xAxisLayer) {
+      this._xAxisLayer.call(this._xAxisGenerator);
+    }//xxxxxxx
+    if (this._yAxisLayer) {
+      this._yAxisLayer.call(this._yAxisGenerator);
+    }
+  }
+
+  _getProfiles(view: UtilityDataView): ProfileDataset {
+    if (this._config.useHighlightProfiles) {
+      return view.highlightProfiles;
+    } else {
+      return view.profiles;
+    }
+  }
+
+  _rescaleYAxis(view: UtilityDataView) {
+    if (this._config.profileLines) {
+      const yTicks = _getCo2ScaleTicks(this._getProfiles(view).series.co2);
+      this._yAxisGenerator = d3.svg.axis()
+	.scale(this._powerScale)
+	.orient('left')
+	.tickFormat(d => String(d * TONS_PER_MONTH_TO_MT_PER_YEAR))  // Convert T/month to MT/y
+	.tickValues(yTicks);
+    } else {
+      const yTicks = _getPowerScaleTicks(this._getProfiles(view).series.demand);
+      this._yAxisGenerator = d3.svg.axis()
         .scale(this._powerScale)
         .orient('left')
         .tickFormat(d => String(d / 1e3))  // Convert megawatts to gigawatts.
         .tickValues(yTicks);
+    }
   }
 
   /**
@@ -337,17 +418,17 @@ export class SupplyDemandProfilesChart implements UtilityDataComponent {
     // Create a static fill for the demand region.
     _createSolidPattern(
         defs,
-        this._config.patterns.demand,
+        this._prefix + this._config.patterns.demand,
         this._config.colors.demand);
     // Create a static fill for the excess generation region.
     _createSpeckledPattern(
         defs,
-        this._config.patterns.excess,
+        this._prefix + this._config.patterns.excess,
         this._config.colors.patternBackground,
         this._config.colors.excess);
     // Create the pattern fills for each energy source.
     this._config.stackingOrder.forEach(source => {
-      _createSolidPattern(defs, `${source}-consumed`, this._config.colors[source]);
+      _createSolidPattern(defs, this._prefix + `${source}-consumed`, this._config.colors[source]);
     });
 
     // Create a group that we'll use for applying margins and padding.
@@ -371,8 +452,8 @@ export class SupplyDemandProfilesChart implements UtilityDataComponent {
   _createDataLayers(parent: d3.Selection<any>) {
     // Energy demand profile.
     this._demandRegion = parent.append('path')
-        .attr('class', 'area')
-        .attr('fill', `url(#${this._config.patterns.demand})`);
+      .attr('class', 'area')
+      .attr('fill', `url(#${this._prefix}${this._config.patterns.demand})`);
     this._demandBorder = parent.append('path')
         .classed('demand-curve-line', true);
 
@@ -394,11 +475,22 @@ export class SupplyDemandProfilesChart implements UtilityDataComponent {
     this._consumedBorder = this._consumedLayer.append('path')
       .classed('consumed-curve-line', true);
 
+    this._spendLayer = parent.append('g')
+      .classed('spend-curve', true);
+    this._spendLine = this._spendLayer.append('path')
+      .classed('spend-curve-line', true);
+
+    this._co2Layer = parent.append('g')
+      .classed('co2-curve', true);
+    this._co2Line = this._co2Layer.append('path')
+      .classed('co2-curve-line', true);
+
     // X and Y axes.
     const xAxisLayer = parent.append('g')
       .attr('class', 'x axis')
       .attr('transform', `translate(0,${this._config.size.height})`)
       .call(this._xAxisGenerator);
+    this._xAxisLayer = xAxisLayer;
     const yAxisLayer = parent.append('g')
         .attr('class', 'y axis')
         .call(this._yAxisGenerator);
@@ -409,6 +501,7 @@ export class SupplyDemandProfilesChart implements UtilityDataComponent {
         .attr('dy', '.71em')
         .style('text-anchor', 'end')
         .text(this._config.labels.yAxis);
+    this._yAxisLayer = yAxisLayer;
     const rightWall = parent.append('line')
       .attr('class', 'bounding-box right-wall')
       .attr('x1', this._config.size.width)
@@ -431,9 +524,9 @@ export class SupplyDemandProfilesChart implements UtilityDataComponent {
    * @param markerPoints The interest marker locations to draw.
    */
 
-  _getInterestMarkersLayout(view: UtilityDataView): MarkerLayout[] {
+  _getInterestMarkersLayout(profiles: ProfileDataset): MarkerLayout[] {
     const markerLayout = getExcessMarkerLayout(
-        view.profiles,
+        profiles,
         this._config.behavior.showExcessLabelThreshold,
         this._config.layout.markers.labelMaxYValue);
 
@@ -469,19 +562,38 @@ export class SupplyDemandProfilesChart implements UtilityDataComponent {
  * @returns A series of times corresponding to axis tick placements.
  * @throws An error if no tick placements are found.
  */
-export function _getTimeScaleTicks(times: Date[]): Date[] {
-  // Add a tick for noon (UTC) on each day in the input time series.
-  const ticks = [];
-  times.forEach(t => {
-    if (t.getUTCHours() == 12) {
-      ticks.push(t);
+export function _getTimeScaleTicks(times: Date[], shortScale: boolean): Date[] {
+  if (shortScale) {
+    // Add a tick for noon (UTC) on every other day in the input time series.
+    const ticks = [];
+    times.forEach(t => {
+	if (t.getUTCHours() == 12 && (t.getUTCDay() & 1)) {
+	  ticks.push(t);
+	}
+      });
+    if (!ticks.length) {
+      throw new Error(
+		      'Expected time series to contain at least one UTC noon time point');
     }
-  });
-  if (!ticks.length) {
-    throw new Error(
-        'Expected time series to contain at least one UTC noon time point');
+    return ticks;
+  } else {
+    // Add a tick at the beginning of the each year in the input time series.
+    const ticks = [];
+    let year = 0;
+    times.forEach(t => {
+	if (t.getUTCFullYear() != year && t.getUTCDate() > 2) {
+	  year = t.getUTCFullYear();
+	  if (year % 5 == 0) {
+	    ticks.push(t);
+	  }
+	}
+      });
+    if (!ticks.length) {
+      throw new Error(
+		      'Expected time series to contain at least one Jan 1 midnight time point');
+    }
+    return ticks;
   }
-  return ticks;
 }
 
 /**
@@ -498,6 +610,18 @@ export function _getPowerScaleTicks(demand: number[]): number[] {
     0,
     truncateThousands(minDemand),  // Baseline power level.
     truncateThousands(maxDemand),  // Peak power level.
+  ]
+}
+
+export function _getCo2ScaleTicks(co2: number[]): number[] {
+  const [minCo2, maxCo2] = d3.extent(co2);
+  function truncateFives(value: number) {
+    return Math.floor(value * TONS_PER_MONTH_TO_MT_PER_YEAR / 5) * 5 / TONS_PER_MONTH_TO_MT_PER_YEAR;
+  }
+  return [
+    0,
+    truncateFives(minCo2),  // Baseline level.
+    truncateFives(maxCo2),  // Peak level.
   ]
 }
 
@@ -567,11 +691,11 @@ export function _createSolidPattern(
  * @param view The data view for the energy supply and demand.
  * @returns A series of points representing the demand over time.
  */
-export function _getDemandSeries(view: UtilityDataView): PowerSample[] {
-  return view.profiles.index.map((t, i) => {
+export function _getDemandSeries(profiles: ProfileDataset): PowerSample[] {
+  return profiles.index.map((t, i) => {
     return {
       timestamp: new Date(t),
-      power: view.profiles.series.demand[i],
+      power: profiles.series.demand[i],
     };
   });
 }
@@ -587,22 +711,21 @@ export function _getDemandSeries(view: UtilityDataView): PowerSample[] {
  * @returns The restructured, ordered energy series data ready for stacking.
  */
 export function getUnstackedSupplyLayout(
-    view: UtilityDataView,
+    profiles: ProfileDataset,
     order: string[]): StackAreaSpan[][] {
-
   // Generate the x-y point representation for each energy source area series.
   const stackedData: {[s: string]: StackAreaSpan[]} = {}
   order.forEach(source => {
     stackedData[source] = [];
   });
-  view.profiles.index.map((timestamp, i) => {
+  profiles.index.map((timestamp, i) => {
     order.forEach(source => {
       stackedData[source].push({
         x: new Date(timestamp),
         // Note that the y-value here is really the height or thickness of the
         // area region at the current index; equivalent to the y-value if the
         // baseline for the current series was zero.
-        y: view.profiles.series[source][i],
+        y: profiles.series[source][i],
       });
     });
   });
@@ -623,13 +746,27 @@ export function getUnstackedSupplyLayout(
  * @param view The data view with energy supply and demand profiles.
  * @returns A piecewise series of consumed energy regions.
  */
-export function getConsumedLayout(view: UtilityDataView): LinePoint[] {
-  const series = view.profiles.series;
-  const points = view.profiles.index.map((t, i) => {
+export function getConsumedLayout(profiles: ProfileDataset): LinePoint[] {
+  const series = profiles.series;
+  const points = profiles.index.map((t, i) => {
     return {
       x: new Date(t),
       y: Math.min(series.supply[i], series.demand[i]),
       defined: (series.supply[i] > 0) && (series.supply[i] <= series.supply[i]),
+    };
+  });
+
+  defineIntervalEndpoints(points);
+  return points;
+}
+
+export function getCo2Layout(profiles: ProfileDataset): LinePoint[] {
+  const series = profiles.series;
+  const points = profiles.index.map((t, i) => {
+    return {
+      x: new Date(t),
+      y: series.co2[i],
+      defined: true,
     };
   });
 
@@ -648,9 +785,9 @@ export function getConsumedLayout(view: UtilityDataView): LinePoint[] {
  * @param view The data view with energy supply and demand profiles.
  * @returns A piecewise series of excess energy regions.
  */
-export function getExcessLayout(view: UtilityDataView): AreaSpan[] {
-  const series = view.profiles.series;
-  const points = view.profiles.index.map((t, i) => {
+export function getExcessLayout(profiles: ProfileDataset): AreaSpan[] {
+  const series = profiles.series;
+  const points = profiles.index.map((t, i) => {
     return {
       x: new Date(t),
       y0: series.demand[i],

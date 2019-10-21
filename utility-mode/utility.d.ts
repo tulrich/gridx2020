@@ -15,13 +15,15 @@ limitations under the License.
 
 
 // Type definition specific to utility mode.
-type UtilityEnergySource = 'coalccs' | 'ngccs' | EnergySource;
-type ProfileSeries = 'supply' | 'demand' | 'unmet' | UtilityEnergySource;
+type UtilityEnergySource = /* 'coalccs' | 'ngccs' | */ EnergySource;
+type ProfileSeries = 'supply' | 'demand' | 'unmet' | 'co2' | 'spend' | UtilityEnergySource;  // TODO 'stored'
+type StorageEnergySource = 'battery' | 'h2';
 
 // Object literal types keyed by a fixed set of values.
 type UtilityEnergySourceMap<T> = {[K in UtilityEnergySource]: T};
 type UtilityEnergySourceSubsetMap<T> = {[K in UtilityEnergySource]?: T};
 type ProfileSeriesMap<T> = {[K in ProfileSeries]: T};
+type StorageEnergySourceMap<T> = {[K in StorageEnergySource]: T};
 
 type UtilityOutcomeBreakdown = ScenarioOutcomeBreakdown<UtilityEnergySource>;
 
@@ -46,6 +48,75 @@ interface ProfileDataset {
   //
   // i.e., for all i, series.foo[i] <=> series.bar[i] <=> index[i].
   series: ProfileSeriesMap<number[]>;
+
+  sumCo2?: number;
+  sumMwh?: number;
+  sumDiscountedCost?: number;
+  sumDiscountedMwh?: number;
+}
+
+interface Ramp {
+  // capacity started construction / endYear avg demand
+  buildFraction: number;
+  atYear: number;
+}
+
+/**
+ * Parameters for modeling an energy source during the transition.
+ */
+interface SourceParameters {
+  // year 1 avg output / year 1 avg demand
+  initialFraction: number;
+
+  // Desired changes to capacity.
+  ramp: Ramp[];
+
+  // Years to construct a plant.
+  buildTime: number;
+  // $/Watt.
+  buildCost: number;
+  // Fixed: $/KW/year (staff, rent, maintenance, etc)
+  operatingCost: number;
+  // Variable: $/MWh
+  fuelCost: number;
+  // Fraction per doubling. 0.15 means 15% cost reduction per doubling of capacity.
+  // Can go negative (increase in cost with increased experience).
+  costLearningRate: number; 
+  // Fraction of year0 demand to use as baseline for learning, in
+  // addition to initial capacity.
+  costLearningBase: number;
+  // gCO2/KWh
+  co2Intensity: number;
+
+  // Years.
+  plantLifetime: number;
+  // Maximum output per nameplate due to refueling/maintenance.
+  maxCapacityFactor: number;
+
+  // 0 means run as baseload, just emit full output.  Non-zero means
+  // this is a load-following source, so adjust output to not exceed
+  // demand. The number prioritizes this source against other sources
+  // (lower numbers dispatched first).
+  loadFollowPriority: number;
+
+  // True if this is dispatchable, i.e. scale the output to demand, as
+  // opposed to always outputting at max.
+  isDispatchable: boolean;
+  // True if this is a storage tech.
+  isStorage: boolean;
+  // For storage tech: between 0 and 1.
+  storageRoundTripEfficiency: number;
+  // Energy capacity per watt of power capacity.
+  storageHours: number;
+}
+
+interface ScenarioParameters {
+  discountRate: number;
+  demandGrowthRate: number;
+  carbonPrice: number;
+  firstYear: number;
+  lastYear: number;
+  source: UtilityEnergySourceMap<SourceParameters>;
 }
 
 /**
@@ -63,10 +134,11 @@ interface UtilityDataView extends SummaryDataView<UtilityEnergySource> {
   // The allocated time profile for each available energy source.
   profiles: ProfileDataset;
 
-  // The per-energy source allocations.
-  //
-  // The utility view configuration state is determined by the allocations.
-  allocations: ProfileAllocations;
+  // A highlight profile, subsetting a region of interest.
+  highlightProfiles?: ProfileDataset;
+
+  // The simulation parameters.
+  params: ScenarioParameters;
 }
 
 /**

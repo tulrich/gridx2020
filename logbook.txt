@@ -1,0 +1,43 @@
+npm run-script build
+npm run-script serve-watch
+
+# Hacks to material-design-lite
+pwd
+/Users/tulrich/Google Drive/git/energystrategies/node_modules/material-design-lite
+
+gulp && cp dist/material.js dist/material.min.js dist/material.css dist/material.min.css .
+
+
+
+
+Comparison with Sepulveda 2018
+
+Theirs:
+
+  * written by experts, peer reviewed
+
+  * 1 year of hourly data (same)
+
+  * their northern system is similar to (same as?) mine (ISO-NE)
+
+  * their dispatch model is much more sophisticated (minimum ramping
+    rates of thermal sources, etc). My contention is this doesn't
+    really doesn't matter (physically) to any scenario with
+    significant batteries on the grid.
+
+  * Runs optimization across sweeps of several variables: CO2, tech costs.
+
+  * They're not really modeling "full decarbonization", ascribing zero
+    CO2 to low-carbon resources. Results below 50g/KWh (where the
+    scenarios diverge) aren't very meaningful, IMO.
+
+  * Models one year. Optimizes. No build time.
+
+Mine:
+
+  * ----> Explicitly models the transition.
+
+  * Newer numbers and modeled learning rates. (E.g. their midrange
+    solar/wind/batt price corresponds approx to today's observed
+    values.)
+

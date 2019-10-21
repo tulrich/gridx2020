@@ -33,6 +33,7 @@ export class EnergyProfileChart implements UtilityDataComponent {
   areaStackingOrder = [
     'nuclear',
     'coal',
+    'hydro',
     'solar',
     'wind',
     'ng',
@@ -91,6 +92,7 @@ export class EnergyProfileChart implements UtilityDataComponent {
         types: {
           solar: 'area',
           wind: 'area',
+          hydro: 'area',
           nuclear: 'area',
           ng: 'area',
           coal: 'area',
@@ -102,6 +104,7 @@ export class EnergyProfileChart implements UtilityDataComponent {
         names: {
           solar: 'Solar',
           wind: 'Wind',
+          hydro: 'Hydro',
           nuclear: 'Nuclear',
           ng: 'Natural Gas',
           unmet: 'Unmet demand',
@@ -112,10 +115,13 @@ export class EnergyProfileChart implements UtilityDataComponent {
         colors: {
           solar: COLORS.SOLAR,
           wind: COLORS.WIND,
+          hydro: COLORS.HYDRO,
           nuclear: COLORS.NUCLEAR,
           ng: COLORS.NG,
           unmet: COLORS.FAILURE,
           coal: COLORS.COAL,
+	  battery: COLORS.BATTERY,
+	  h2: COLORS.H2,
         },
       },
       point: {

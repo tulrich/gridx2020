@@ -15,8 +15,6 @@ limitations under the License.
 
 import * as formatters from './formatters';
 import * as utility from './utility-mode/controller';
-import * as policy from './policy-mode/controller';
-import * as comp from './compare-mode/controller';
 import * as appendix from './components/layout';
 import * as util from './util';
 
@@ -27,29 +25,31 @@ import 'url-search-params-polyfill';
 
 
 polyfill();
-formatters.configure();
+//formatters.configure();
 
-const policyDatasetUrl = 'data/policy-dataset.csv';
-const policySchemaUrl = 'data/policy-schema.json';
 const utilityDatasetUrl = 'data/utility-dataset.json';
+// From https://github.com/google/energysimulation/tree/master/gridsim/data/profiles
+const transitionDatasetUrl = 'data/profiles_neiso.csv';
+//xxx const policyDatasetUrl = 'data/policy-dataset.csv';
+//xxx const policySchemaUrl = 'data/policy-schema.json';
 
-// By default, switching tabs does not reset the scroll to the top of the new
-// newly opened tab in MDL.
-const scrollContainer = document.getElementById('scroll-container');
-util.selectElements('.mdl-tabs__tab .mdl-button').forEach(el => {
-  el.onclick = (event: Event) => {
-    scrollContainer.scrollTop = 0;
-  };
-});
+//// By default, switching tabs does not reset the scroll to the top of the new
+//// newly opened tab in MDL.
+//const scrollContainer = document.getElementById('scroll-container');
+//util.selectElements('.mdl-tabs__tab .mdl-button').forEach(el => {
+//  el.onclick = (event: Event) => {
+//    scrollContainer.scrollTop = 0;
+//  };
+//});
 
 // Create the controllers for the app.
-const utilityController = new utility.UtilityController(utilityDatasetUrl);
-const policyController = new policy.PolicyController(
-    new comp.CompareController());
+const utilityController = new utility.UtilityController(transitionDatasetUrl);
+//xxx const policyController = new policy.PolicyController(
+//xxx    new comp.CompareController());
 
 window.addEventListener('load', event => {
   console.debug('window.load', event);
   appendix.initAppendixLinks();
   utilityController.init();
-  policyController.fetchAndInit(policySchemaUrl, policyDatasetUrl);
+  //xxx  policyController.fetchAndInit(policySchemaUrl, policyDatasetUrl);
 });

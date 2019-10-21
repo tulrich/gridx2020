@@ -26,7 +26,7 @@ class EnergyBreakdownChart implements SummaryDataComponent {
   _chart: c3.ChartAPI;
 
   // Defines the deterministic ordering of data series within the chart.
-  _dataOrder = ['nuclear', 'solar', 'wind', 'ng', 'storage'];
+  _dataOrder = ['nuclear', 'solar', 'wind', 'hydro', 'ng', 'storage'];
 
   /**
    * Constructor.

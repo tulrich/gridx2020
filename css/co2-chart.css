@@ -58,6 +58,11 @@ limitations under the License.
   fill: #fff;
 }
 
+.co2-chart-title-right {
+  font-size: 13pt;
+  fill: #fff;
+}
+
 /* Customize the co2 goal chart for large outcome area */
 
 #policy-mode .co2-chart-title {

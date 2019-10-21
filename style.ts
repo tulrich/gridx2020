@@ -27,18 +27,24 @@ export const COLORS = {
   SOLAR_LIGHT: '#FFF59D',
   SOLAR_DARK: '#FFAB00',
   WIND: '#41b6c4',
+  HYDRO: '#192EB5',
+  //  HYDRO: '#9ecae1',
   NUCLEAR: '#a1dab4',
   NUCLEAR_DARK: '#4DB6AC',
-  NG: '#225ea8',
+  NG: '#EBAB34',
   NGCCS: '#1d91c0',
   COAL: '#cb181d',
   COALCCS: '#fb6a4a',
-  HYDRO: '#9ecae1',
   STORAGE: '#8c6bb1',
+  BATTERY: '#fc4e03',
+  H2: '#db03fc',
 
   // Additional indicator colors.
   FAILURE: '#FF1744',
   DEMAND: '#F0F0F0',
   EXCESS_LIGHT: '#ffffff',
   EXCESS: '#BDBDBD',
+
+  CO2: '#202020',
+  SPEND: '#00962d',
 };

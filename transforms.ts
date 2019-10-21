@@ -68,7 +68,7 @@ export function deltas(baseline: ScenarioOutcome, current: ScenarioOutcome) {
 
   return {
     co2: delta(baseline.co2, current.co2),
-    cost: delta(baseline.cost, current.cost),
+    cost: delta(baseline.discountedCost, current.discountedCost),
   };
 };
 
@@ -79,7 +79,7 @@ export function deltas(baseline: ScenarioOutcome, current: ScenarioOutcome) {
  * @returns The total scenario cost ($USD/MWh).
  */
 export function totalCost(view: SummaryDataView<string>) {
-  return perMWhCost(view.summary.cost, view.summary.energy);
+  return perMWhCost(view.summary.discountedCost, view.summary.energy);
 }
 
 /**
@@ -89,7 +89,7 @@ export function totalCost(view: SummaryDataView<string>) {
  * @returns The baseline scenario cost ($USD/MWh).
  */
 export function baselineCost(view: SummaryDataView<string>) {
-  return perMWhCost(view.baseline.cost, view.baseline.energy);
+  return perMWhCost(view.baseline.discountedCost, view.baseline.energy);
 }
 
 /**
@@ -101,9 +101,9 @@ export function baselineCost(view: SummaryDataView<string>) {
  */
 export function baselineDeltaCost(view: SummaryDataView<string>) {
   const baselineCost = perMWhCost(
-view.baseline.cost, view.baseline.energy);
+view.baseline.discountedCost, view.baseline.energy);
   const scenarioCost = perMWhCost(
-      view.summary.cost, view.summary.energy)
+      view.summary.discountedCost, view.summary.energy)
   return scenarioCost - baselineCost;
 }
 
@@ -126,7 +126,7 @@ export function resourceCost(view: PolicyDataView, source: PolicyBreakdownEntry)
  * @returns The fraction of total cost contributed by the given resource.
  */
 export function costFraction(view: PolicyDataView, source: PolicyBreakdownEntry) {
-  return view.summary.breakdown[source].cost / view.summary.cost;
+  return 0; // xxxx view.summary.breakdown[source].cost / view.summary.discountedCost;
 }
 
 /**

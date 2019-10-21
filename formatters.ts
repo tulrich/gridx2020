@@ -107,6 +107,7 @@ function d3_format_precision(x, p) {
 }
 
 export function configure() {
+    return;//xxxx
     // Override d3's formatPrefix function
     d3.formatPrefix = function(value, precision) {
         let i = 0;

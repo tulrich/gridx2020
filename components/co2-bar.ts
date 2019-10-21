@@ -54,6 +54,11 @@ interface ChartOptions {
     // (default is left-aligned within the bar itself).
     offset?: {x?: number, y?: number}
   },
+  textRight?: {
+    // How far to adjust the title placement from its default position
+    // (default is left-aligned within the bar itself).
+    offset?: {x?: number, y?: number}
+  },
   transition?: {delay?: number, duration?: number},
 }
 
@@ -71,9 +76,10 @@ const DEFAULT_CONFIG: ChartOptions = {
     ]
   },
   bar: {width: 270, height: 50},
-  padding: {left: 10, right: 15, top: 6, bottom: 50},
+  padding: {left: 10, right: 15, top: 6, bottom: 45},
   ticks: {size: 10, valueGap: 15, labelGap: 16, alignThreshold: 50, xOffset: 3},
   text: {offset: {x: 8, y: 6}},
+  textRight: {offset: {x: 235, y: 6}},
   transition: {delay: 50, duration: 100}
 };
 
@@ -91,6 +97,7 @@ export class CO2GoalChart implements SummaryDataComponent<string> {
   // Dynamic chart elements.
   _bar: d3.Selection<any>;
   _text: d3.Selection<any>;
+  _textRight: d3.Selection<any>;
 
   /**
    * Constructor.
@@ -121,7 +128,8 @@ export class CO2GoalChart implements SummaryDataComponent<string> {
         .attr('width', this._co2Scale(view.summary.co2));
     // Update the current value display text.
     this._text
-        .text(`${formatters.largeNumberFormatter(view.summary.co2)}t CO2/yr`);
+        .text(`${formatters.largeNumberFormatter(view.summary.co2)}t CO2`);
+    this._textRight.text(d3.format('.0f')(view.summary.co2 * 1e3 / view.summary.energy) + 'g/KWh');
   }
 
   /**
@@ -219,6 +227,15 @@ export class CO2GoalChart implements SummaryDataComponent<string> {
         // Vertically center the text within the bar and adjust the baseline.
         .attr('y', (this._config.bar.height / 2) + this._config.text.offset.y);
 
+    this._textRight = parent.append('text')
+      .classed('co2-chart-title-right', true)
+      .text('')
+      .attr('text-anchor', 'end')  //xxxx
+      // Align to the right.
+      .attr('x', this._config.padding.left + this._config.textRight.offset.x)
+      // Vertically center the text within the bar and adjust the baseline.
+      .attr('y', (this._config.bar.height / 2) + this._config.textRight.offset.y);
+
     // CO2 emissions reference point markers.
     const markers = parent
         .selectAll('.co2-chart-marker')
@@ -231,8 +248,8 @@ export class CO2GoalChart implements SummaryDataComponent<string> {
     // intended 'this' context is also why the callback is not a fat arrow.
     const self = this;
     markers.each(function (d, i) {
-      // Here, the 'this' context is the DOM node mapped to the data value for
-      // the current marker.
+      // Here, the 'this' context is the DOM node mapped to the data value for 
+     // the current marker.
       self._createMarker(d3.select(this), d.value, d.label);
     });
   }

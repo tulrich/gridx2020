@@ -19,6 +19,45 @@ import * as util from '../util';
 import * as transforms from '../transforms';
 
 
+export function parseAndPadCsv(dataset: string[][]) {
+  let profile: ProfileDataset = {
+    index: [],
+    units: 'MW',
+    series: {
+      demand: [],
+      solar: [],
+      wind: [],
+    },
+  } as any;
+
+  // Initialize the index. Timestamps per hour from start to end.
+  for (var timestamp = config.START_TIMESTAMP; timestamp < config.END_TIMESTAMP; timestamp += 1000 * 60 * 60) {
+    profile.index.push(timestamp);
+  }
+  profile.units = 'MW';
+  
+//   profile.series.demand = [];
+//   profile.series.solar = [];
+//   profile.series.wind = [];
+  for (var row of dataset) {
+    if (profile.series.demand.length >= profile.index.length) {
+      break;
+    }
+    profile.series.demand.push(Number(row['DEMAND']));
+    profile.series.solar.push(Number(row['SOLAR']));
+    profile.series.wind.push(Number(row['WIND']));
+  }
+  // Pad out to needed length.
+  let baseLength = profile.series.demand.length;
+  while (profile.series.demand.length < profile.index.length) {
+    profile.series.demand.push(profile.series.demand[profile.series.demand.length % baseLength]);
+    profile.series.solar.push(profile.series.solar[profile.series.solar.length % baseLength]);
+    profile.series.wind.push(profile.series.wind[profile.series.wind.length % baseLength]);
+  }
+
+  return profile;
+}
+
 /**
  * Gets the amount of energy generation required for fulfilling demand.
  *
@@ -84,8 +123,9 @@ export function getSuppliedEnergyBreakdown(profiles: ProfileDataset) {
  * @return The fixed cost of building the specified energy generation capacity.
  */
 function getFixedCost(capacity: number, source: string) {
-  // Dimensional analysis: MW * $USD/MW => $USD
-  return capacity * config.FIXED_COST[source];
+  return 0;
+//   // Dimensional analysis: MW * $USD/MW => $USD
+//   return capacity * config.FIXED_COST[source];
 }
 
 /**
@@ -99,8 +139,9 @@ function getFixedCost(capacity: number, source: string) {
  * @return The variable cost of generating the given amount of energy.
  */
 function getVariableCost(energy: number, source: string) {
-  // Dimensional analysis: MWh * $USD/MWh => $USD
-  return energy * config.VARIABLE_COST[source] * transforms.DISCOUNT_RATE_WEEKLY;
+  return 0;
+//   // Dimensional analysis: MWh * $USD/MWh => $USD
+//   return energy * config.VARIABLE_COST[source] * transforms.DISCOUNT_RATE_WEEKLY;
 }
 
 /**
@@ -112,100 +153,330 @@ function getVariableCost(energy: number, source: string) {
  *     metric tonnes.
  */
 function getCo2(energy: number, source: string): number {
-  // Dimensional analysis: MWh * lbs/MWh * tonnes/lbs => tonnes
-  //
-  // Note: the 1-week co2 is scaled to the 1-year level for consistency with
-  // scenario outcome datasets.
-  return energy * config.CO2_RATE[source] * transforms.WEEKS_PER_YEAR;
+  return 0;
+//   // Dimensional analysis: MWh * lbs/MWh * tonnes/lbs => tonnes
+//   //
+//   // Note: the 1-week co2 is scaled to the 1-year level for consistency with
+//   // scenario outcome datasets.
+//   return energy * config.CO2_RATE[source] /* * transforms.WEEKS_PER_YEAR */;
 }
 
-/**
- * Gets an energy profile set scaled by the given per-source allocations.
- *
- * For non-dispatchable energy sources (e.g., solar, wind, nuclear), the shape
- * of each profile is maintained and the integral is scaled according to the
- * assigned allocation.
- *
- * For dispatchable energy sources (e.g., natural gas), the shape of each
- * profile is taken as the upper bound of available dispatch capacity. In the
- * returned energy profile set, dispatchable source profiles reflect the amount
- * of energy that was required to meet demand (without overage) at each point
- * in time.
- *
- * Note: only one (or zero) dispatchable energy sources may be enabled
- * concurrently (e.g., either ng or ngccs, but not both, can be non-zero).
- *
- * @param allocations Per-energy source allocation fractions (in [0,1]).
- * @param profiles A set of energy generation profiles.
- * @return A scaled set of energy generation profiles covering the same
- *   time period.
- */
-export function getAllocatedEnergyProfiles(
-    allocations: ProfileAllocations,
+
+export function simulateGrid(
+    params: ScenarioParameters,
     profiles: ProfileDataset): ProfileDataset {
+  ;
+  // TODO
 
-  // Currently, the full amount of potential dispatch is directed at a single
-  // energy source; if support for multiple energy sources is desired in the
-  // future, a policy for selecting capacity from the available set of dispatch
-  // options must be implemented (e.g., equal amounts from each, cheapest first
-  // until capacity is exhausted, etc.).
-  if (allocations.ng > 0 && allocations.ngccs > 0) {
-    throw new Error(
-        'Unsupported allocation of multiple dispatchable energy sources')
+  // Hydro:
+  //   * treat it like variable RE?
+  //     + fits framework. is there resource data?
+  //     - doesn't credit the storage ability of reservoir hydro
+  // from https://github.com/google/energysimulation/blob/master/gridsim/data/costs/regional_hydro_limits.csv
+  // neiso max_energy: 6902000 max_power: 1798.9
+
+  // Biomass:
+  //  * dispatchable. look up co2. tricky.
+
+  // Future tech
+
+  // url coding
+
+  // highlight assumptions that differ from defaults.
+
+  // Report grid share based on dispatch (?)
+
+  // Ziegler[2019] 20 years of weather & demand data
+  //
+  // demand: https://www.eia.gov/realtime_grid/#/data/table?end=20191006T23&start=20190930T03&bas=001&regions=0
+  // * csv for US regions, 2015-2019?
+
+  // 20 years of solar insolation, North Adams MA
+  // https://rredc.nrel.gov/solar/old_data/nsrdb/1991-2010/hourly/siteonthefly.cgi?id=725075
+  //
+  // Nationwide
+  // https://rredc.nrel.gov/solar/old_data/nsrdb/1991-2010/hourly/list_by_state.html
+
+
+  // Notes
+  //
+  // emissions goal: tick for 1.5C.
+  //
+  // https://www.ipcc.ch/site/assets/uploads/sites/2/2019/02/SR15_Chapter2_Low_Res.pdf
+  //
+  // something like, need to get to zero by 2035. Doing straight line from 2020 to 0 at 2035 yields
+  // about 243Mt
+
+
+  // Normalization by grid share:
+  //   sum(scaledDemand) == sum(normalizedProfile) --> then apply scale factor.
+  //    normalizedProfile = avg(scaledDemand) / avg(profile)
+  // Then ramps are in units of yearOneDemand. Gives them direct applicability to grid mixes.
+  //
+  // capacity[source] = max(normalizedProfile[year1]) / maxCF * sourceScale
+
+  // Normalize source profiles so avg year one source supply == avg year 1 demand.
+  const oneYear = 365 * 24;
+  let oneYearDemand = profiles.series.demand.slice(0, oneYear);
+  const yearOneAvgDemand = d3.sum(oneYearDemand) / oneYear;
+  const yearOnePeakDemand = d3.max(oneYearDemand);
+  let normalizedProfiles: ProfileSeriesMap<number[]> = {} as any;
+  let yearOneSourceCapacity = {};
+  config.ALL_ENERGY_SOURCES.forEach(source => {
+      let series = profiles.series[source];
+      if (!series) {
+        // Make a profile scaled to yearOneAverageDemand.
+        series = new Array(profiles.series.demand.length);
+        for (let i = 0;  i < series.length; i++) {
+          series[i] = yearOneAvgDemand;
+        }
+        normalizedProfiles[source] = series;
+      } else {
+        // For intermittent sources, normalize the profile so avg source == avg demand.
+        const yearOneAvgSupply = d3.sum(series.slice(0, oneYear)) / oneYear;
+        let scale = 1;
+        if (yearOneAvgSupply > 0) {
+          scale = yearOneAvgDemand / yearOneAvgSupply;
+        }
+        normalizedProfiles[source] = series.map(x => x * scale);
+      }
+      yearOneSourceCapacity[source] = d3.max(normalizedProfiles[source].slice(0, oneYear)) / params.source[source].maxCapacityFactor;
+    });
+  let scaledDemand = [...profiles.series.demand];
+
+  let profileScale = {};
+  for (let source in normalizedProfiles) {
+    profileScale[source] = 1;
   }
+  profileScale['demand'] = 1;
 
-  // Scale the energy profiles by their user-assigned capacity allocations.
-  const allocatedProfiles: UtilityEnergySourceMap<number[]> = {
-    solar: profiles.series.solar.map(x => x * allocations.solar),
-    wind: profiles.series.wind.map(x => x * allocations.wind),
-    nuclear: profiles.series.nuclear.map(x => x * allocations.nuclear),
-    ng: profiles.series.ng.map(x => x * allocations.ng),
-    coal: profiles.series.coal.map(x => x * allocations.coal),
-    ngccs: profiles.series.ngccs.map(x => x * allocations.ngccs),
-    coalccs: profiles.series.coalccs.map(x => x * allocations.coalccs),
+  const computeRampValue = (source: SourceParameters, firstYear: number, year: number): number => {
+    let ri = 0;
+    for (ri = 0; ri < source.ramp.length; ri++) {
+      if (year <= source.ramp[ri].atYear) {
+        let year0 = firstYear;
+        let val0 = source.initialFraction;
+        if (ri > 0) {
+          year0 = source.ramp[ri - 1].atYear;
+          val0 = source.ramp[ri - 1].buildFraction;
+        }
+        let f = (year - year0) / (source.ramp[ri].atYear - year0);
+        return val0 + (source.ramp[ri].buildFraction - val0) * f;
+      }
+    }
+    if (source.ramp.length == 0) {
+      return source.initialFraction;
+    } else {
+      return source.ramp[source.ramp.length - 1].buildFraction;
+    }
   };
+
+  // Build desired capacity according to the plans.
+  let yearCount = params.lastYear - params.firstYear;
+  let sourceScale: ProfileSeriesMap<number[]> = {} as any;  // array indexed by (year - year0)
+  let sourceSpend: ProfileSeriesMap<number[]> = {} as any;  // array indexed by (year - year0)
+  let discountedCost: ProfileSeriesMap<number> = {} as any;
+  config.ALL_ENERGY_SOURCES.forEach(source => {
+      let p = params.source[source];
+      let learningFactor = 1;
+      let learningBase = p.initialFraction + p.costLearningBase;
+      let cumulativeBuilt = learningBase;
+      sourceScale[source] = [];
+      sourceSpend[source] = [];
+      discountedCost[source] = 0;
+      let desiredFraction = [];
+      for (let y = 0; y < yearCount; y++) {
+        desiredFraction[y] = computeRampValue(params.source[source], params.firstYear, y + params.firstYear);
+      }
+      // Allocate the initial fleet. Assume it is a uniform mixture of ages, retire it evenly across
+      // the lifetime of a plant. Assume there are plants in the pipeline so don't start
+      // retiring until year=plantLifetime (TODO do the cost accounting for this).
+      let pl = params.source[source].plantLifetime;
+      let y0 = pl
+      let y1 = y0 + pl;
+      for (let y = 0; y < yearCount; y++) {
+        if (y < y0) {
+          sourceScale[source][y] = params.source[source].initialFraction;
+        } else if (y < y1) {
+          let f = 1 - (y - y0) / (y1 - y0);
+          sourceScale[source][y] = params.source[source].initialFraction * f;
+        } else {
+          sourceScale[source][y] = 0;
+        }
+        sourceSpend[source][y] = 0;
+      }
+
+      // Try to build the desired capacity.
+      for (let y = 0; y < yearCount; y++) {
+        let toBuildThisYear = desiredFraction[y] - sourceScale[source][y];
+        let built = 0;
+        if (toBuildThisYear < 0) {
+          // Force-retire unwanted capacity.
+          sourceScale[source][y] = desiredFraction[y];
+        } else if (y < params.source[source].buildTime) {
+          // Can't finish anything this year.
+        } else {
+          // Go back in time and spend on the desired capacity.
+          built = toBuildThisYear;
+          let mwBuilt = built * yearOneSourceCapacity[source];
+          let spent = mwBuilt * 1e6 * params.source[source].buildCost * learningFactor;
+          let spentPerYear = spent / params.source[source].buildTime;
+          // Allocate the spending across the build years.
+          for (let yy = y - params.source[source].buildTime; yy < y; yy++) {
+            sourceSpend[source][yy] += spentPerYear;
+          }
+        }
+        // Built capacity lives for the plant lifetime.
+        if (built > 0) {
+          let y1 = Math.min(params.lastYear - params.firstYear, y + params.source[source].plantLifetime);
+          for (let yy = y; yy < y1; yy++) {
+            sourceScale[source][yy] += built;
+          }
+
+          // Update the learning rate.
+          cumulativeBuilt += built;
+          learningFactor = Math.pow((1 - p.costLearningRate), Math.log(cumulativeBuilt / learningBase) * Math.LOG2E);
+        }
+      }
+    });
 
   // Given the non-dispatchable energy supply profiles, which are fixed,
   // compute the available dispatchable energy supply profile and remaining
   // unmet demand profile.
   const unmetProfile = [];
-  const dispatchProfile = [];
+  const dispatchProfile = {
+  	ng: [],
+	battery: [],
+	h2: [],
+  };
   const supplyProfile = [];
-  for (let i = 0; i < profiles.series.demand.length; ++i) {
-    // Find the total power supplied at time[i] for non-dispatchables.
-    let supplied = 0;
-    config.NON_DISPATCHABLE_ENERGY_SOURCES.forEach(name => {
-      supplied += allocatedProfiles[name][i];
-    });
+  let storageState = {
+      battery: 0.,
+      h2: 0.,
+  };
 
-    // Any remaining gap beteween demand[i] and sum(non_dispatchable[k][i])
-    // needs to be fulfilled by a dispatchable power supply or it goes
-    // unfulfilled.
-    let needed = Math.max(profiles.series.demand[i] - supplied, 0);
-    let dispatchAvailable = Math.max(
-        allocatedProfiles.ng[i], allocatedProfiles.ngccs[i]);
-    let dispatched = 0;
-    let unmet = 0;
-    if (dispatchAvailable >= needed) {
-      // We have enough dispatch to cover current timepoint's demand.
-      //
-      // Dispatch only what's needed currently
-      dispatched = needed;
-      unmet = 0;
-    } else {
-      // Insufficient dispatch available... gap in power supply.
-      //
-      // Dispatch all available and record gap
-      dispatched = dispatchAvailable;
-      unmet = needed - dispatched;
+  let year = 0;
+  let demandScale = 1.0;
+  let discountScale = 1.0;
+  let sumDiscountedCost = 0;
+  let sumDiscountedMwh = 0;
+  let sumMwh = 0;
+  let sumCo2 = 0;
+  for (let j = 0; j < scaledDemand.length; j += oneYear) {
+    let j1 = Math.min(scaledDemand.length, j + oneYear);
+    // Update sources in place, for the coming year.
+    for (let name in normalizedProfiles) {
+      for (let i = j; i < j1; i++) {
+        normalizedProfiles[name][i] *= sourceScale[name][year];
+      }
+    }
+    for (let i = j; i < j1; i++) {
+      scaledDemand[i] *= demandScale;
     }
 
-    // Add any additional energy that was dispatched to meet demand.
-    supplied += dispatched;
+    let mwhThisYear = 0;
+    for (let i = j; i < j1; i++) {
+      // Find the total power supplied at time[i] for non-dispatchables.
+      let supplied = 0;
+      config.NON_DISPATCHABLE_ENERGY_SOURCES.forEach(name => {
+          supplied += normalizedProfiles[name][i];
+        });
 
-    dispatchProfile.push(dispatched);
-    unmetProfile.push(unmet);
-    supplyProfile.push(supplied);
+      let demand = scaledDemand[i];
+      // Any remaining gap beteween demand[i] and sum(non_dispatchable[k][i])
+      // needs to be fulfilled by a dispatchable power supply or it goes
+      // unfulfilled.
+      let needed = Math.max(demand - supplied, 0);
+
+      let dispatched = 0;
+      let unmet = 0;
+      config.STORAGE_ENERGY_SOURCES.forEach(name => {
+          let sourceSupplied = 0.;
+          let sourceAvailable = normalizedProfiles[name][i];
+          sourceAvailable = Math.min(sourceAvailable, storageState[name]);
+          sourceSupplied = Math.min(needed, sourceAvailable);
+          storageState[name] -= sourceSupplied;
+          needed -= sourceSupplied;
+          dispatched += sourceSupplied;
+          dispatchProfile[name].push(sourceSupplied);
+        });
+      config.DISPATCHABLE_ENERGY_SOURCES.forEach(name => {
+          let sourceSupplied = 0.;
+          let sourceAvailable = normalizedProfiles[name][i];
+          sourceSupplied = Math.min(needed, sourceAvailable);
+          needed -= sourceSupplied;
+          dispatched += sourceSupplied;
+          dispatchProfile[name].push(sourceSupplied);
+        });
+
+      if (needed > 0) {
+        unmet = needed;
+      }
+
+      // Add any additional energy that was dispatched to meet demand.
+      supplied += dispatched;
+
+      let excess = supplied - demand;
+      // Store some energy, if possible.
+      config.STORAGE_ENERGY_SOURCES.forEach(name => {
+          if (excess > 0) {
+            let efficiency = params.source[name].storageRoundTripEfficiency;
+            let capacity = normalizedProfiles[name][i] * params.source[name].storageHours;
+            let maxRemainingCapacity = capacity - storageState[name];
+            let maxAccept = Math.min(
+                                     normalizedProfiles[name][i],
+                                     maxRemainingCapacity / efficiency);
+            let accept = Math.max(0, Math.min(excess * efficiency, maxAccept));
+            storageState[name] += accept;
+            excess -= accept / efficiency;
+          }
+        });
+
+      unmetProfile.push(unmet);
+      supplyProfile.push(supplied);
+      mwhThisYear += supplied;
+      if (excess > 0) {
+        mwhThisYear -= excess;
+      }
+      //xxx TODO storedProfile.push(stored);
+    }
+
+    // Update costs.
+    config.ALL_ENERGY_SOURCES.forEach(source => {
+        let p = params.source[source];
+        let cost = 0;
+        // Build cost this year.
+        cost += sourceSpend[source][year];
+        // Fuel cost this year.
+        let profile = p.isDispatchable ? dispatchProfile[source] : normalizedProfiles[source];
+        let mwh = d3.sum(profile.slice(j, j1));
+        cost += mwh * p.fuelCost;
+        // Capacity opex this year.
+        let capacityMw = sourceScale[source][year] * yearOneSourceCapacity[source];
+        // operatingCost is in $/KW_capacity/year
+        cost += capacityMw * 1e3 * p.operatingCost;
+        // Co2 emissions.
+        let co2 = mwh * 1e3 * p.co2Intensity / 1e6;  // intensity in grams/kWh, output metric tons CO2
+        // Carbon price.
+        cost += co2 * params.carbonPrice;
+        
+        discountedCost[source] = cost * discountScale;
+        sumDiscountedCost += discountedCost[source];
+
+        sumCo2 += co2;
+      });
+    sumMwh += mwhThisYear;
+    sumDiscountedMwh += mwhThisYear * discountScale;
+
+    // Increment year & scales.
+    year = Math.min(year + 1, yearCount - 1);
+    demandScale *= (1 + params.demandGrowthRate);
+    discountScale *= (1 - params.discountRate);
+  }
+
+  let zeroSeries = new Array<number>(profiles.index.length);
+  for (let i = 0; i < zeroSeries.length; i++) {
+    zeroSeries[i] = 0;
   }
 
   return {
@@ -213,7 +484,7 @@ export function getAllocatedEnergyProfiles(
     units: profiles.units,
     series: {
       // Demand curve targeted for fulfillment.
-      demand: profiles.series.demand,
+      demand: scaledDemand,
 
       // Profile of unmet demand.
       unmet: unmetProfile,
@@ -222,30 +493,38 @@ export function getAllocatedEnergyProfiles(
       supply: supplyProfile,
 
       // Non-dispatchable energy supplied.
-      solar: allocatedProfiles.solar,
-      wind: allocatedProfiles.wind,
-      nuclear: allocatedProfiles.nuclear,
-      coal: allocatedProfiles.coal,
-      coalccs: allocatedProfiles.coalccs,
+      solar: normalizedProfiles.solar,
+      wind: normalizedProfiles.wind,
+      hydro: normalizedProfiles.hydro,
+      nuclear: normalizedProfiles.nuclear,
+      coal: normalizedProfiles.coal,
 
       // Dispatchable-energy supplied.
-      ng: allocations.ng > 0 ? dispatchProfile : allocatedProfiles.ng,
-      ngccs: allocations.ngccs > 0 ? dispatchProfile : allocatedProfiles.ngccs,
-    }
+      ng: dispatchProfile.ng,
+
+      battery: dispatchProfile.battery,
+      h2: dispatchProfile.h2,
+      co2: zeroSeries,
+      spend: zeroSeries,
+    },
+    sumCo2: sumCo2,
+    sumMwh: sumMwh,
+    sumDiscountedCost: sumDiscountedCost,
+    sumDiscountedMwh: sumDiscountedMwh,
   };
 }
 
 /**
  * Summarize the given profile set into aggregated cost and co2 values.
  *
- * Note: assumes provided profiles are for exactly 1 week in 168 hour-sized
+  * Note: assumes provided profiles are for exactly 1 week in 168 hour-sized
  * slices when accounting for the co2 emissions discount rate as part of
  * variable costs.
  *
  * @param profiles An energy profile collection for which to aggregate stats.
  * @return A summary of cost and co2 outcomes by energy generation source.
  */
-export function summarize(profiles: ProfileDataset): UtilityOutcomeBreakdown {
+export function summarize(params: ScenarioParameters, profiles: ProfileDataset): UtilityOutcomeBreakdown {
   // Compute the consumed (by demand) subset of the energy generation profiles.
   const supplyBreakdown = getSuppliedEnergyBreakdown(profiles);
 
@@ -254,10 +533,13 @@ export function summarize(profiles: ProfileDataset): UtilityOutcomeBreakdown {
     ng: null,
     solar: null,
     wind: null,
+    hydro: null,
     nuclear: null,
     coal: null,
-    ngccs: null,
-    coalccs: null,
+    //    ngccs: null,
+    //    coalccs: null,
+    battery: null,
+    h2: null,
   };
   config.ALL_ENERGY_SOURCES.forEach(source => {
     // Find the total energy generated by the profile (MWh).
@@ -278,20 +560,105 @@ export function summarize(profiles: ProfileDataset): UtilityOutcomeBreakdown {
   });
 
   // Compute rollups across all energy sources.
-  const totalCo2 = util.sum(Object.keys(breakdown).map(s => breakdown[s].co2));
-  const totalCost = util.sum(Object.keys(breakdown).map(s => {
-    return breakdown[s].fixedCost + breakdown[s].variableCost;
-  }));
-  // The energy generation from the weekly profile is replicated for a year-long
-  // timespan, as is done for the total co2 emissions.
+  const totalCo2 = profiles.sumCo2; // in metric tons
   const totalConsumed = util.sum(Object.keys(breakdown).map(s => {
-    return breakdown[s].consumed * transforms.WEEKS_PER_YEAR;
+    return breakdown[s].consumed;
   }));
 
   return {
     co2: totalCo2,
-    cost: totalCost,
-    energy: totalConsumed,
+    discountedCost: profiles.sumDiscountedCost,
+    energy: profiles.sumMwh,  // totalConsumed,
     breakdown: breakdown,
   };
+}
+
+// Condense and average the values into month-long increments So each monthly power value will be in
+// units of average MW, and co2 is in average t/hour.
+export function condenseByPeriod(profiles: ProfileDataset, params: ScenarioParameters): [ProfileDataset, ProfileDataset] {
+  let condensed: ProfileDataset = {
+    index: [],
+    units: profiles.units,
+    series: {} as any,
+    sumDiscountedCost: profiles.sumDiscountedCost,
+    sumDiscountedMwh: profiles.sumDiscountedMwh,
+    sumCo2: profiles.sumCo2,
+    sumMwh: profiles.sumMwh,
+  };
+
+  let highlightProfile = undefined;
+  // Find the worst hour, if any.
+  let unmetHour = -1;
+  let maxDemandHour = 0;  // Should make this min-reserve hour or something. xxxx
+  let maxDemand = 0;
+  for (let i = 0; i < profiles.series.unmet.length; i++) {
+    if (profiles.series.unmet[i] > 0) {
+      unmetHour = i;
+      break;
+    }
+    if (profiles.series.demand[i] > maxDemand) {
+      maxDemand = profiles.series.demand[i];
+      maxDemandHour = i;
+    }
+  }
+  let highlightHour = maxDemandHour;
+  if (unmetHour >= 0) {
+    highlightHour = unmetHour;
+  }
+  let i0 = Math.max(0, highlightHour - 84);
+  let i1 = i0 + 168;
+  highlightProfile = {
+    index: profiles.index.slice(i0, i1),
+    units: profiles.units,
+    series: {} as any,
+  };
+  for (let src in profiles.series) {
+    highlightProfile.series[src] = profiles.series[src].slice(i0, i1);
+  }
+
+  // Get the per-period timestamps.
+  const periodMs = 30 * 24 * 60 * 60 * 1000;  // One month.
+  let index = 0;
+  let periodStarts: number[] = [];
+  for (let index = 0; index < profiles.index.length; ) {
+    periodStarts.push(index);
+    let timestamp = profiles.index[index];
+    condensed.index.push(timestamp);
+    let nextTimestamp = timestamp + periodMs;
+    for ( ; index < profiles.index.length && profiles.index[index] < nextTimestamp; index++) {
+      // Step to next start-of-period timestamp.
+    }
+  }
+  periodStarts.push(profiles.index.length);
+
+  // Accumulate by period.
+  condensed.series['co2'] = new Array<number>(periodStarts.length - 1);
+  condensed.series['spend'] = new Array<number>(periodStarts.length - 1);
+  for (let i = 0; i < condensed.series['co2'].length; i++) {
+    condensed.series['co2'][i] = 0;
+    condensed.series['spend'][i] = 0;
+  }
+  for (let source in profiles.series) {
+    if (source == 'co2') continue;
+    let series = profiles.series[source];
+    condensed.series[source] = [];
+    for (let i = 0; i < periodStarts.length - 1; i++) {
+      let i0 = periodStarts[i];
+      let i1 = periodStarts[i + 1];
+      let sum = 0;
+      let average = 0;
+      for (let j = i0; j < i1; j++) {
+	sum += series[j];
+      }
+      if (i1 > i0) {
+        average = sum / (i1 - i0);
+      }
+      condensed.series[source].push(average);
+      if (source in params.source) {
+        condensed.series['co2'][i] += sum * 1e3 * params.source[source].co2Intensity / 1e6;  // metric tons
+      }
+    }
+  }
+
+  return [condensed, highlightProfile];
 }

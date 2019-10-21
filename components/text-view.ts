@@ -49,6 +49,6 @@ export class InputTextView {
     this.element.selectionEnd = MAX_LENGTH;
     this.element.maxLength = MAX_LENGTH;
 
-    this.element.width = String(300);
+    this.element.width = 300; //xxx String(300);
   }
 }

@@ -219,7 +219,7 @@ export const STORAGE_ROUND_TRIP_EFFICIENCY: StorageEnergySourceMap<number> = {
 //
 // What about the hydrogen storage tanks? Salt caverns?
 // https://prod-ng.sandia.gov/techlib-noauth/access-control.cgi/2011/114845.pdf
-// * underground storage is stupidly cheap, ~0.3 $/KWh.
+// * underground storage is extremely cheap, ~0.3 $/KWh.
 // * tank storage is more, $15/KWh.
 // For 720 hour storage, underground is 0.3 * 720 = $216/KW --> 0.22 $/W, pretty cheap.
 // Tank is $15 * 720 = $10,800 --> 11 $/W, too expensive. Underground it is.

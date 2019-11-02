@@ -91,7 +91,7 @@ limitations under the License.
 
           <a href="#co2-cost-panel" class="mdl-tabs__tab mini utility-graph-tab" role="tab" id="co2-cost-tab">
             <button class="mdl-button utility-graph-tab mini" role="tab" aria-selected="true" tabindex="3">
-              <div><span class="utility-mode-co2"></span>t&nbsp;CO2</div>
+              <div><span class="utility-mode-co2"></span>g/kWh</div>
               <div>$<span class="utility-mode-cost"></span>/MWh</div>
             </button>
           </a>
@@ -527,6 +527,26 @@ limitations under the License.
                 <input type="checkbox" id="preset-util-default" class="mdl-icon-toggle__input">
                 <span class="mdl-icon-toggle__label">Default</span>
               </label>
+              <label class="preset mdl-icon-toggle mdl-js-icon-toggle" for="preset-util-re">
+                <input type="checkbox" id="preset-util-re" class="mdl-icon-toggle__input">
+                <span class="mdl-icon-toggle__label">RE</span>
+              </label>
+              <label class="preset mdl-icon-toggle mdl-js-icon-toggle" for="preset-util-nuclear">
+                <input type="checkbox" id="preset-util-nuclear" class="mdl-icon-toggle__input">
+                <span class="mdl-icon-toggle__label">Nuclear</span>
+              </label>
+              <label class="preset mdl-icon-toggle mdl-js-icon-toggle" for="preset-util-no-h2">
+                <input type="checkbox" id="preset-util-no-h2" class="mdl-icon-toggle__input">
+                <span class="mdl-icon-toggle__label">No H2</span>
+              </label>
+              <label class="preset mdl-icon-toggle mdl-js-icon-toggle" for="preset-util-gas">
+                <input type="checkbox" id="preset-util-gas" class="mdl-icon-toggle__input">
+                <span class="mdl-icon-toggle__label">Gas</span>
+              </label>
+              <label class="preset mdl-icon-toggle mdl-js-icon-toggle" for="preset-util-flat">
+                <input type="checkbox" id="preset-util-flat" class="mdl-icon-toggle__input">
+                <span class="mdl-icon-toggle__label">Flat</span>
+              </label>
               <i id="tooltip-launcher-utility-presets" class="material-icons info">info_outline</i>
               <span class="tooltip mdl-tooltip mdl-tooltip--right"
                     for="tooltip-launcher-utility-presets">
@@ -623,7 +643,7 @@ limitations under the License.
               error.</li>
 
               <li>The gas model is based on simple cycle turbines,
-              which are cheap and ramp fast but burn more gas per KWh
+              which are cheap and ramp fast but burn more gas per kWh
               than combined cycle.</li>
 
               <li>Initial conditions are based on 2017 grid mix which
@@ -700,7 +720,7 @@ limitations under the License.
               reasonable results.
             </p>
 
-            <p>Values by source, in gCO2e/KWh:</p>
+            <p>Values by source, in gCO2e/kWh:</p>
             <ul>
               <li>solar: 8</li>
               <li>wind: 5</li>
@@ -750,29 +770,30 @@ limitations under the License.
                 Fixed: Cost to operate and maintain the plant ($ per Kilowatt of capacity per year)
               </li>
               <li>
-                Variable: Cost of fuel to generate energy ($ per Megawatt hour).
+                Variable: Cost of fuel, operations and maintenance to
+                generate energy ($ per Megawatt hour).
               </li>
             </ul>
 
             <p>The default capital, fixed and variable cost values for the sources are:</p>
             <ul>
-              <li>Solar: $1.1/W, $0.30/KW/y, $0/MWh</li>
-              <li>Wind: $2.0/W, $0.40/KW/y, $0/MWh</li>
-              <li>Hydro: $4.0/W, $1.20/KW/y, $0/MWh</li>
-              <li>Nuclear: $5.0/W, $2.10/KW/y, $7.5/MWh</li>
-              <li>Gas: $0.85/W, $1.20/KW/y, $22/MWh</li>
-              <li>Coal: $0.80/W, $1.20/KW/y, $28/MWh</li>
-              <li>Battery: $1.156/W, $0.20/KW/y, $0/MWh</li>
-              <li>H2: $2.08/W, $1/W, $5.5/MWh</li>
+              <li>Solar: $1.10/W, $10.5/KW/y, $0/MWh, 30y life.</li>
+              <li>Wind: $1.35/W, $32/KW/y, $0/MWh, 20y life.</li>
+              <li>Hydro: $2.95/W, $40.85/KW/y, $1.36/MWh, 50y life.</li>
+              <li>Nuclear: $9.38/W, $125/KW/y, $9.63/MWh, 40y life.</li>
+              <li>Gas: $0.825/W, $7.35/KW/y, $38.1/MWh, 20y life.</li>
+              <li>Coal: $5.70/W, $60.0/KW/y, $18.5/MWh, 40y life.</li>
+              <li>Battery (4hr): $1.26/W, $26.8/KW/y, $0/MWh, 20y life.</li>
+              <li>H2 (720hr): $2.08/W, $20/W, $5.5/MWh, 20y life.</li>
             </ul>
-            <p>The solar, wind, gas, nuclear and hydro values are
+            <p>The solar (PV crystalline), wind (onshore), gas
+            (peaking), nuclear, coal and battery (lithium) values are
             derived
+            from <a href="https://www.lazard.com/media/450784/lazards-levelized-cost-of-energy-version-120-vfinal.pdf">[Lazard
+            2019]</a> by taking the average value of the cost & time
+            ranges.  Hydro values are derived
             from <a href="https://www.eia.gov/outlooks/aeo/assumptions/pdf/table_8.2.pdf">[EIA
-            Outlook 2019]</a>. Coal capital and fixed costs are a
-            guess based on gas (figures may be off, and by the way
-            don't use coal). Fuel cost for coal
-            from <a href="https://www.eia.gov/electricity/monthly/update/resource_use.php">EIA
-            Update July 2019</a>.
+            Outlook 2019]</a>.
 
             The H2 values are based
             on <a href="https://www.hydrogen.energy.gov/pdfs/14004_h2_production_cost_pem_electrolysis.pdf">[energy.gov]</a>
@@ -784,7 +805,7 @@ limitations under the License.
             <h2>CO2 Intensity Assumptions</h2>
             <p>
               The CO2 intensities are lifecycle plus thermal & water
-              vapor values, expressed in units of gCO2e/KWh.
+              vapor values, expressed in units of gCO2e/kWh.
             </p>
 
             <h2>Validation</h2>
@@ -801,7 +822,7 @@ limitations under the License.
               31% nuclear, 7% hydro, 7% other renewables (trash,
               biomass, etc), 3% wind, and ~1% solar. Production was
               102,500 GWh, with 31.7 Mt CO2 produced, and average of
-              309 g/KWh. I checked and tweaked the initial values in
+              309 g/kWh. I checked and tweaked the initial values in
               this model to produce a similar result. (I added the oil
               and other renewables production to gas.)
             </p>

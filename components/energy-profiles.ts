@@ -219,33 +219,35 @@ export class SupplyDemandProfilesChart implements UtilityDataComponent {
         .attr('d', this._demandBorderPathGenerator);
     }
 
-    // Update points-of-interest markers.
-    const markerPoints = this._getInterestMarkersLayout(this._getProfiles(view));
-    // Text label for each marker.
-    const labels = this._excessMarkerLayer
+    if (!this._config.useCo2Profiles) {
+      // Update points-of-interest markers.
+      const markerPoints = this._getInterestMarkersLayout(this._getProfiles(view));
+      // Text label for each marker.
+      const labels = this._excessMarkerLayer
         .selectAll('.interest-marker-label')
         .data(markerPoints);
-    labels.enter().append('text')
+      labels.enter().append('text')
         .classed('interest-marker-label', true)
         .text(d => d.label)
         .style('text-anchor', 'middle');
-    labels.exit().remove();
-    labels
+      labels.exit().remove();
+      labels
         .attr('x', d => d.x)
         .attr('y', d => d.labelYOffset + d.labelYGap);
-    // Arrow from text label to data point of interest.
-    const arrows = this._excessMarkerLayer
+      // Arrow from text label to data point of interest.
+      const arrows = this._excessMarkerLayer
         .selectAll('.interest-marker-arrow')
         .data(markerPoints, d => String(d.x));
-    arrows.enter().append('line')
+      arrows.enter().append('line')
         .classed('interest-marker-arrow', true);
-    arrows.exit().remove();
-    arrows
+      arrows.exit().remove();
+      arrows
         .attr('x1', d => d.x)
         .attr('y1', d => d.y)
         .attr('x2', d => d.x)
         .attr('y2', d => d.labelYOffset)
         .style('stroke', d => d.color);
+    }
   }
 
   /**
@@ -509,9 +511,11 @@ export class SupplyDemandProfilesChart implements UtilityDataComponent {
       .attr('y1', 0)
       .attr('y2', this._config.size.height);
 
-    // Interest point markers.
-    this._excessMarkerLayer = parent.append('g')
+    if (!this._config.useCo2Profiles) {
+      // Interest point markers.
+      this._excessMarkerLayer = parent.append('g')
         .attr('class', 'excess-marker-group');
+    }
   }
 
   /**
@@ -526,9 +530,7 @@ export class SupplyDemandProfilesChart implements UtilityDataComponent {
 
   _getInterestMarkersLayout(profiles: ProfileDataset): MarkerLayout[] {
     const markerLayout = getExcessMarkerLayout(
-        profiles,
-        this._config.behavior.showExcessLabelThreshold,
-        this._config.layout.markers.labelMaxYValue);
+                                               profiles, this._config);
 
     const markerPoints = markerLayout.map(p => {
       const point: MarkerLayout = {
@@ -808,9 +810,11 @@ export function getExcessLayout(profiles: ProfileDataset): AreaSpan[] {
  * @param maxPlacement
  * @returns A series of excess marker locations and label placements.
  */
-export function getExcessMarkerLayout(
-    profiles: ProfileDataset, showThreshold: number, maxPlacement: number):
+export function getExcessMarkerLayout(profiles: ProfileDataset, config: ChartOptions):
     MarkerPlacement[] {
+
+  let showThreshold = config.behavior.showExcessLabelThreshold;
+  let maxPlacement = config.layout.markers.labelMaxYValue;
 
   const markers = [];
 
@@ -834,7 +838,7 @@ export function getExcessMarkerLayout(
   });
 
   // Don't show excess markers for tiny slivers of excess, only big chunks.
-  if (maxExcess.excessValue > showThreshold) {
+  if (maxExcess.excessValue > showThreshold || config.useCo2Profiles) {
     markers.push(maxExcess);
   }
 

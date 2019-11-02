@@ -556,8 +556,8 @@ export class UtilityController implements SliderNotifee {
     }
 
     elems = document.getElementsByClassName('utility-mode-co2');
-    let tCo2 = view.profiles.sumCo2;
-    let co2String = d3.format(',.3s')(tCo2);
+    let gCo2 = view.profiles.sumCo2 * 1e3 / view.profiles.sumMwh;
+    let co2String = d3.format('.0f')(gCo2);
     for (let i = 0; i < elems.length; i++) {
       elems[i].textContent = co2String;
     }
@@ -677,9 +677,11 @@ function createUtilityPresets(callback: (stateString: string) => void): PresetOp
   const presetElementConfig:
       {[K in config.UtilityPresetOption]: HTMLElement} = {
     DEFAULT: document.getElementById('preset-util-default'),
-//     SOLAR: document.getElementById('preset-util-solar'),
-//     WIND: document.getElementById('preset-util-wind'),
-//     RE_AND_STORAGE: document.getElementById('preset-util-re-and-storage'),
+    RE: document.getElementById('preset-util-re'),
+    NUCLEAR: document.getElementById('preset-util-nuclear'),
+    NO_H2: document.getElementById('preset-util-no-h2'),
+    FLAT: document.getElementById('preset-util-flat'),
+    GAS: document.getElementById('preset-util-gas'),
   };
 
   // Callback that reconfigures the set of sliders for a given preset

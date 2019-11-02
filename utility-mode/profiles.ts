@@ -168,21 +168,17 @@ export function simulateGrid(
   ;
   // TODO
 
-  // Hydro:
-  //   * treat it like variable RE?
-  //     + fits framework. is there resource data?
-  //     - doesn't credit the storage ability of reservoir hydro
-  // from https://github.com/google/energysimulation/blob/master/gridsim/data/costs/regional_hydro_limits.csv
-  // neiso max_energy: 6902000 max_power: 1798.9
+  // debug MT vs gCO2e/KWh
 
-  // Biomass:
-  //  * dispatchable. look up co2. tricky.
+  // Separate out the sliders for each source (to facilitate version changes)
+  //   * add initial growth rate (for trajectory in years before build time)
+  //   * separate co2Intensity into fixed and variable, index fixed to build year grid co2 intensity
 
-  // Future tech
+  // Hill-climb button
 
-  // url coding
+  // Show all graphs button
 
-  // highlight assumptions that differ from defaults.
+  // Chip showing source plan thumbnailsZ
 
   // Report grid share based on dispatch (?)
 
@@ -197,15 +193,17 @@ export function simulateGrid(
   // Nationwide
   // https://rredc.nrel.gov/solar/old_data/nsrdb/1991-2010/hourly/list_by_state.html
 
+  // Hydro:
+  //   * treat it like variable RE?
+  //     + fits framework. is there resource data?
+  //     - doesn't credit the storage ability of reservoir hydro
+  // from https://github.com/google/energysimulation/blob/master/gridsim/data/costs/regional_hydro_limits.csv
+  // neiso max_energy: 6902000 max_power: 1798.9
 
-  // Notes
-  //
-  // emissions goal: tick for 1.5C.
-  //
-  // https://www.ipcc.ch/site/assets/uploads/sites/2/2019/02/SR15_Chapter2_Low_Res.pdf
-  //
-  // something like, need to get to zero by 2035. Doing straight line from 2020 to 0 at 2035 yields
-  // about 243Mt
+  // Biomass:
+  //  * dispatchable. look up co2. tricky.
+
+  // Future tech
 
 
   // Normalization by grid share:
@@ -569,6 +567,7 @@ export function summarize(params: ScenarioParameters, profiles: ProfileDataset):
     co2: totalCo2,
     discountedCost: profiles.sumDiscountedCost,
     energy: profiles.sumMwh,  // totalConsumed,
+    co2PerKwh: totalCo2 * 1e3 / profiles.sumMwh,
     breakdown: breakdown,
   };
 }

@@ -129,7 +129,7 @@ export class CO2GoalChart implements SummaryDataComponent<string> {
     // Update the current value display text.
     this._text
         .text(`${formatters.largeNumberFormatter(view.summary.co2)}t CO2`);
-    this._textRight.text(d3.format('.0f')(view.summary.co2 * 1e3 / view.summary.energy) + 'g/KWh');
+    this._textRight.text(d3.format('.0f')(view.summary.co2PerKwh) + 'g/kWh');
   }
 
   /**

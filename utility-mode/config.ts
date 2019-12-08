@@ -43,64 +43,6 @@ export const END_TIMESTAMP = (new Date(Date.UTC(2040, 2 - 1, 15, 0, 0))).getTime
 // };
 // export const POPULATION = 39.1e6; // California; Source: 2015 US Census.
 
-/*
-// Fixed cost (capital + fixed) per MW of capacity by energy source.
-//
-// Units are dollars USD per MW of capacity ($/MW)
-export const FIXED_COST: UtilityEnergySourceMap<number> = {
-  ng: 770633.,
-  solar: 1356035.,
-  wind: 2181533.,
-  nuclear: 4667258.,
-  coal: 3388939.,
-  //  ngccs: 1505159,
-  //  coalccs: 4559261.,
-  battery: 1156000.,
-  h2: 2000000.,
-};
-
-// Variable cost (including fuel) per MW-hour by energy source.
-//
-// Units are dollars USD per MWh ($/MWh).
-export const VARIABLE_COST: UtilityEnergySourceMap<number> = {
-  ng: 32.1,
-  nuclear: 24.0,  //xxxx
-  solar: 5.0,
-  wind: 12.0,  //xxx
-  coal: 23.3,
-  //  ngccs: 47.7,
-  //  coalccs: 42.9,
-  battery: 5.0,
-  h2: 5.0,
-};
-
-// Rate of CO2 creation for each energy source.
-//
-// Units are tonnes-of-co2 per MWh-of-energy-supplied (tonnes/MWh)
-export const CO2_RATE: UtilityEnergySourceMap<number> = {
-  ng: 0.4538,
-  nuclear: 0.004,  //xxx
-  solar: -0.002,  //xxx
-  wind: 0.0,
-  coal: 0.8582,
-  //  ngccs: 0.0549,
-  //  coalccs: 0.1013,
-  battery: 0.0,
-  h2: 0.0,
-};
-
-// Hours of storage for storage types.
-export const STORAGE_HOURS: StorageEnergySourceMap<number> = {
-  battery: 4.,
-  h2: 720.,
-};
-
-export const STORAGE_ROUND_TRIP_EFFICIENCY: StorageEnergySourceMap<number> = {
-  battery: 0.8,
-  h2: 0.4,
-};
-*/
-
 // Grid mix (2018)
 // https://www.iso-ne.com/about/key-stats/resource-mix/
 //
@@ -296,6 +238,36 @@ export const STORAGE_ROUND_TRIP_EFFICIENCY: StorageEnergySourceMap<number> = {
 //   3,000-8,400 $/KW; fixed 40-80 $/KW/y; var 2-5 $/MWh; fuel 1.45 $/mmBTU, heat rate 8,750-12,000 BTU/kWh; const time 60-66 mos (5-5.5y).
 //   Avg 5,700 $/KW; 60 $/KW/y; Fuel: 0.0150 $/kWh, var: 0.0035 $/KWh, sum 0.0185 $/kWh. 40 yr life.
 
+
+// Lazard cost numbers, v13, Nov 2019, from https://www.lazard.com/media/451086/lazards-levelized-cost-of-energy-version-130-vf.pdf
+//
+// PV crystalline, utility-stale (100MW)
+//   1,100-900 $/KW; 12-9 $/KW/y; 9 mos; 30 years.
+//   Avg: 1.0 $/W, 10.5 $/KW/y; 9 mos; 30 y.
+// Wind, onshore (150MW)
+//   1,100-1,500 $/KW; 28-36 $/KW/y; 12 mos; 20 y.
+//   Avg: 1.3 $/W; 32 $/KW/y; 12 mos; 20 y.
+// Hydro
+//   --
+// Nuclear (2200MW)
+//   6,900-12,200 $/KW; 108-133 $/KW/y; var 3.50-4.25 $/MWh; fuel 0.85 $/mmBTU, heat rate 10,450 BTU/kWh; 69 mo (5.75y); 40 y.
+//   Avg: 9.55 $/W; 120 $/KW/y; fuel 0.00888 $/kWh, var 0.00375 $/kWh, sum 0.012 $/kWh. 5.75y; 40y.
+// Gas Peaking (240-50)
+//   700-950 $/KW; fixed 5.5-20.75 $/KW/y, var 4.75-6.25 $/MWh; fuel 3.45 $/mmBTU, heat rate 9804-8000 BTU/kWh; 1-1.5y; 20 y.
+//   Avg: 825 $/KW; 13.125 $/KW/y; fuel 0.0307 $/kWh, var 0.0055 $/kWh, sum 0.0362 $/kWh. 1-1.5y; 20y.
+// Coal (600MW)
+//   3,000-6,250 $/KW; 40.75-81.75 $/KW/y, var 2.75-5 $/MWh; fuel 1.45 $/mmBTU, heat rate 8,750-12,000 BTU/KWh; 5-5.5y; 40 y.
+//   Avg: 4.625 $/W; 61.125 $/KW/y; fuel 0.015 $/kWh, var 0.003875 $/kWh, sum 0.018875 $/kWh; 5y; 40y.
+
+
+// Wind 5 year CAGR: 7%
+// PV 5 year CAGR: 13%
+
+// Learning rates: https://www.mdpi.com/2071-1050/11/8/2310/pdf
+// * 1-factor (learn by doing) vs 2-factor (learn by doing + learn by searching (R&D))
+
+
+
 // Lazard storage numbers, from https://www.lazard.com/media/450774/lazards-levelized-cost-of-storage-version-40-vfinal.pdf
 // Lithium-ion (Wholesale)
 //   232-398 $/KWh. EPC costs $16. Installed cost $114-181. O&M % of BESS 1.28-0.76%. O&M % of PCS 1.71-1.01%. Warranty expense % of BESS 1.50%. Warranty expense $ of PCS 2.0%. eff 87-90%. Lifetime 20y.
@@ -333,9 +305,8 @@ export const DEFAULT_PARAMETERS: ScenarioParameters = {
           atYear: 2040,
         }],
       buildTime: 1,
-      buildCost: 1.10,
-      // https://medium.com/@solar.dao/everything-you-need-to-know-about-operations-maintenance-o-m-for-utility-scale-pv-solar-plants-9d0048e9b9a2
-      operatingCost: 10.5,  // was 22 "No idea, need support for this." Duncan Campbell says "on small commerical projects I'm using 18, including amortized cost of inverter replacement once, I figured utility scale would be even less"
+      buildCost: 1.0,
+      operatingCost: 10.5,
       fuelCost: 0,
       costLearningRate: 0.15,
       costLearningBase: 0.08,  // More solar deployed outside ISO-NE, less learning rate benefit.
@@ -352,7 +323,7 @@ export const DEFAULT_PARAMETERS: ScenarioParameters = {
     wind: {
       initialFraction: 0.04,
       buildTime: 1,
-      buildCost: 1.35,
+      buildCost: 1.3,
       ramp: [{
           buildFraction: 0.20,
           atYear: 2030,
@@ -402,7 +373,7 @@ export const DEFAULT_PARAMETERS: ScenarioParameters = {
     nuclear: {
       initialFraction: 0.30,
       buildTime: 6,
-      buildCost: 9.38,
+      buildCost: 9.55,
       ramp: [{
           buildFraction: 0.30,
           atYear: 2030,
@@ -410,12 +381,12 @@ export const DEFAULT_PARAMETERS: ScenarioParameters = {
           buildFraction: 0.30,
           atYear: 2040,
         }],
-      operatingCost: 125,
-      fuelCost: 9.63,
+      operatingCost: 120,
+      fuelCost: 12,
       costLearningRate: 0.1,
-      costLearningBase: 0,
+      costLearningBase: 0.3,
       co2Intensity: 13,
-      plantLifetime: 50,
+      plantLifetime: 40,
       // servicing: ~2 months every ~2 years, spring or fall
       // https://www.eia.gov/todayinenergy/detail.php?id=1490
       maxCapacityFactor: 0.91,
@@ -437,10 +408,10 @@ export const DEFAULT_PARAMETERS: ScenarioParameters = {
           buildFraction: 2.45,
           atYear: 2040,
         }],
-      operatingCost: 7.35,
-      fuelCost: 38.1,
+      operatingCost: 13.125,
+      fuelCost: 36.2,
       costLearningRate: 0.05,
-      costLearningBase: 0,
+      costLearningBase: 1.4,
       co2Intensity: 447,
       plantLifetime: 20,
       maxCapacityFactor: 0.95,
@@ -454,7 +425,7 @@ export const DEFAULT_PARAMETERS: ScenarioParameters = {
     coal: {
       initialFraction: 0.02,
       buildTime: 5,
-      buildCost: 5.70, // copied gas, dunno real value. was 0.80,
+      buildCost: 4.625,
       ramp: [{
           buildFraction: 0.0,
           atYear: 2025,
@@ -462,10 +433,10 @@ export const DEFAULT_PARAMETERS: ScenarioParameters = {
           buildFraction: 0.0,
           atYear: 2040,
         }],
-      operatingCost: 60.0,
-      fuelCost: 18.5,  // not sure, find a source for this
+      operatingCost: 61.1,
+      fuelCost: 18.9,
       costLearningRate: 0.05,
-      costLearningBase: 0,
+      costLearningBase: 1,
       co2Intensity: 927,  // max slider value
       plantLifetime: 40,
       maxCapacityFactor: 0.95,

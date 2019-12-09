@@ -252,7 +252,7 @@ limitations under the License.
                       <li>Build time: how long it takes to build capacity of this source, before it starts producing.</li>
                       <li>Build cost: total cost to build source capacity. Spread evenly over the build time.</li>
                       <li>Annual plant cost: annual cost to operate and maintain a plant, as a function of nameplate capacity.</li>
-                      <li>Fuel cost: input cost per unit of energy delivered.</li>
+                      <li>Variable cost: input cost per unit of energy delivered (includes fuel).</li>
                       <li>Cost learning rate: percent cost reduction per doubling of capacity built.</li>
                       <li>CO2 intensity: how much CO2 is emitted per increment of energy produced. Lifecycle emissions (see About for details).</li>
                       <li>Plant lifetime: how long a plant produces.</li>
@@ -280,7 +280,7 @@ limitations under the License.
                   </div>
                   <div id="solar-build-cost-slider" class="utility-slider"><div class="utility-slider-caption">build cost</div></div>
                   <div id="solar-operating-cost-slider" class="utility-slider"><div class="utility-slider-caption">annual plant cost</div></div>
-                  <div id="solar-fuel-cost-slider" class="utility-slider"><div class="utility-slider-caption">fuel cost</div></div>
+                  <div id="solar-fuel-cost-slider" class="utility-slider"><div class="utility-slider-caption">variable cost</div></div>
                   <div id="solar-cost-learning-rate-slider" class="utility-slider"><div class="utility-slider-caption">cost learning rate</div></div>
                   <div id="solar-co2-intensity-slider" class="utility-slider"><div class="utility-slider-caption">co2 intensity</div></div>
                   <div id="solar-plant-lifetime-slider" class="utility-slider"><div class="utility-slider-caption">plant lifetime</div></div>
@@ -307,7 +307,7 @@ limitations under the License.
                   <div id="wind-build-time-slider" class="utility-slider"><div class="utility-slider-caption">build time</div></div>
                   <div id="wind-build-cost-slider" class="utility-slider"><div class="utility-slider-caption">build cost</div></div>
                   <div id="wind-operating-cost-slider" class="utility-slider"><div class="utility-slider-caption">annual plant cost</div></div>
-                  <div id="wind-fuel-cost-slider" class="utility-slider"><div class="utility-slider-caption">fuel cost</div></div>
+                  <div id="wind-fuel-cost-slider" class="utility-slider"><div class="utility-slider-caption">variable cost</div></div>
                   <div id="wind-cost-learning-rate-slider" class="utility-slider"><div class="utility-slider-caption">cost learning rate</div></div>
                   <div id="wind-co2-intensity-slider" class="utility-slider"><div class="utility-slider-caption">co2 intensity</div></div>
                   <div id="wind-plant-lifetime-slider" class="utility-slider"><div class="utility-slider-caption">plant lifetime</div></div>
@@ -335,7 +335,7 @@ limitations under the License.
                   <div id="hydro-build-time-slider" class="utility-slider"><div class="utility-slider-caption">build time</div></div>
                   <div id="hydro-build-cost-slider" class="utility-slider"><div class="utility-slider-caption">build cost</div></div>
                   <div id="hydro-operating-cost-slider" class="utility-slider"><div class="utility-slider-caption">annual plant cost</div></div>
-                  <div id="hydro-fuel-cost-slider" class="utility-slider"><div class="utility-slider-caption">fuel cost</div></div>
+                  <div id="hydro-fuel-cost-slider" class="utility-slider"><div class="utility-slider-caption">variable cost</div></div>
                   <div id="hydro-cost-learning-rate-slider" class="utility-slider"><div class="utility-slider-caption">cost learning rate</div></div>
                   <div id="hydro-co2-intensity-slider" class="utility-slider"><div class="utility-slider-caption">co2 intensity</div></div>
                   <div id="hydro-plant-lifetime-slider" class="utility-slider"><div class="utility-slider-caption">plant lifetime</div></div>
@@ -363,7 +363,7 @@ limitations under the License.
                   <div id="nuclear-build-time-slider" class="utility-slider"><div class="utility-slider-caption">build time</div></div>
                   <div id="nuclear-build-cost-slider" class="utility-slider"><div class="utility-slider-caption">build cost</div></div>
                   <div id="nuclear-operating-cost-slider" class="utility-slider"><div class="utility-slider-caption">annual plant cost</div></div>
-                  <div id="nuclear-fuel-cost-slider" class="utility-slider"><div class="utility-slider-caption">fuel cost</div></div>
+                  <div id="nuclear-fuel-cost-slider" class="utility-slider"><div class="utility-slider-caption">variable cost</div></div>
                   <div id="nuclear-cost-learning-rate-slider" class="utility-slider"><div class="utility-slider-caption">cost learning rate</div></div>
                   <div id="nuclear-co2-intensity-slider" class="utility-slider"><div class="utility-slider-caption">co2 intensity</div></div>
                   <div id="nuclear-plant-lifetime-slider" class="utility-slider"><div class="utility-slider-caption">plant lifetime</div></div>
@@ -393,7 +393,7 @@ limitations under the License.
                   <div id="ng-build-time-slider" class="utility-slider"><div class="utility-slider-caption">build time</div></div>
                   <div id="ng-build-cost-slider" class="utility-slider"><div class="utility-slider-caption">build cost</div></div>
                   <div id="ng-operating-cost-slider" class="utility-slider"><div class="utility-slider-caption">annual plant cost</div></div>
-                  <div id="ng-fuel-cost-slider" class="utility-slider"><div class="utility-slider-caption">fuel cost</div></div>
+                  <div id="ng-fuel-cost-slider" class="utility-slider"><div class="utility-slider-caption">variable cost</div></div>
                   <div id="ng-cost-learning-rate-slider" class="utility-slider"><div class="utility-slider-caption">cost learning rate</div></div>
                   <div id="ng-co2-intensity-slider" class="utility-slider"><div class="utility-slider-caption">co2 intensity</div></div>
                   <div id="ng-plant-lifetime-slider" class="utility-slider"><div class="utility-slider-caption">plant lifetime</div></div>
@@ -422,7 +422,7 @@ limitations under the License.
                   <div id="coal-build-time-slider" class="utility-slider"><div class="utility-slider-caption">build time</div></div>
                   <div id="coal-build-cost-slider" class="utility-slider"><div class="utility-slider-caption">build cost</div></div>
                   <div id="coal-operating-cost-slider" class="utility-slider"><div class="utility-slider-caption">annual plant cost</div></div>
-                  <div id="coal-fuel-cost-slider" class="utility-slider"><div class="utility-slider-caption">fuel cost</div></div>
+                  <div id="coal-fuel-cost-slider" class="utility-slider"><div class="utility-slider-caption">variable cost</div></div>
                   <div id="coal-cost-learning-rate-slider" class="utility-slider"><div class="utility-slider-caption">cost learning rate</div></div>
                   <div id="coal-co2-intensity-slider" class="utility-slider"><div class="utility-slider-caption">co2 intensity</div></div>
                   <div id="coal-plant-lifetime-slider" class="utility-slider"><div class="utility-slider-caption">plant lifetime</div></div>
@@ -452,7 +452,7 @@ limitations under the License.
                   <div id="battery-build-time-slider" class="utility-slider"><div class="utility-slider-caption">build time</div></div>
                   <div id="battery-build-cost-slider" class="utility-slider"><div class="utility-slider-caption">build cost</div></div>
                   <div id="battery-operating-cost-slider" class="utility-slider"><div class="utility-slider-caption">annual plant cost</div></div>
-                  <div id="battery-fuel-cost-slider" class="utility-slider"><div class="utility-slider-caption">fuel cost</div></div>
+                  <div id="battery-fuel-cost-slider" class="utility-slider"><div class="utility-slider-caption">variable cost</div></div>
                   <div id="battery-cost-learning-rate-slider" class="utility-slider"><div class="utility-slider-caption">cost learning rate</div></div>
                   <div id="battery-co2-intensity-slider" class="utility-slider"><div class="utility-slider-caption">co2 intensity</div></div>
                   <div id="battery-plant-lifetime-slider" class="utility-slider"><div class="utility-slider-caption">plant lifetime</div></div>
@@ -481,7 +481,7 @@ limitations under the License.
                   <div id="h2-build-time-slider" class="utility-slider"><div class="utility-slider-caption">build time</div></div>
                   <div id="h2-build-cost-slider" class="utility-slider"><div class="utility-slider-caption">build cost</div></div>
                   <div id="h2-operating-cost-slider" class="utility-slider"><div class="utility-slider-caption">annual plant cost</div></div>
-                  <div id="h2-fuel-cost-slider" class="utility-slider"><div class="utility-slider-caption">fuel cost</div></div>
+                  <div id="h2-fuel-cost-slider" class="utility-slider"><div class="utility-slider-caption">variable cost</div></div>
                   <div id="h2-cost-learning-rate-slider" class="utility-slider"><div class="utility-slider-caption">cost learning rate</div></div>
                   <div id="h2-co2-intensity-slider" class="utility-slider"><div class="utility-slider-caption">co2 intensity</div></div>
                   <div id="h2-plant-lifetime-slider" class="utility-slider"><div class="utility-slider-caption">plant lifetime</div></div>
@@ -1160,7 +1160,7 @@ limitations under the License.
         <!-- </div> --> <!-- mdl-grid -->
 
         <h2>Code</h2>
-        <p>TODO</p>
+	See <a href="https://github.com/tulrich/gridx2020">https://github.com/tulrich/gridx2020</a>
       </div>
     </div> <!-- tabs -->
   </main> <!-- main content -->

@@ -11,6 +11,9 @@ npm install # update
 npm run-script build
 npm run-script serve-watch
 
+# push to web
+rsync -Pvr dist/ tulrich@...:~/public_html/tulrich/gridx2020/
+
 # Hacks to material-design-lite
 pwd
 /Users/tulrich/Google Drive/git/energystrategies/node_modules/material-design-lite

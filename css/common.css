@@ -50,11 +50,6 @@ p {
   font-size: 10pt;
 }
 
-li {
-  line-height: 1.4;
-  font-size: 12px;
-}
-
 a {
   color: #69a4e4;
   font-weight: normal;
@@ -284,7 +279,7 @@ label {
 
 .tooltip {
     text-align: left;
-    font-size: 12px;
+    font-size: 14px;
     font-weight: normal;
     line-height: 1.4;
     background: rgba(66, 66, 66, .95);
@@ -297,6 +292,8 @@ label {
 }
 
 .tooltip-definition-list li {
+  line-height: 1.4;
+  font-size: 12px;
   display: flex;
   display: -webkit-flex;
   -webkit-justify-content: space-between;

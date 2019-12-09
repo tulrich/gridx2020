@@ -114,3 +114,14 @@ limitations under the License.
   text-anchor: middle;
   text-transform: uppercase;
 }
+
+// Support my-mdl-tabs panel switching
+.my-mdl-tabs__panel {
+  display: block;
+}
+.my-mdl-tabs__panel.is-upgraded {
+  display: none;
+}
+.my-mdl-tabs__panel.is-upgraded.is-active {
+  display: block;
+}

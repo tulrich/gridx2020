@@ -107,35 +107,35 @@ view.baseline.discountedCost, view.baseline.energy);
   return scenarioCost - baselineCost;
 }
 
-/**
- * Extracts the single-resource cost.
- *
- * @param view A policy outcome view.
- * @param source A resource name; e.g., "solar" or "storage".
- * @returns The cost of the given resource ($USD/MWh).
- */
-export function resourceCost(view: PolicyDataView, source: PolicyBreakdownEntry) {
-  return totalCost(view) * costFraction(view, source);
-}
-
-/**
- * Extracts the single-resource cost as a fraction of total scenario cost.
- *
- * @param view A policy outcome view.
- * @param source A resource name; e.g., "solar" or "storage".
- * @returns The fraction of total cost contributed by the given resource.
- */
-export function costFraction(view: PolicyDataView, source: PolicyBreakdownEntry) {
-  return 0; // xxxx view.summary.breakdown[source].cost / view.summary.discountedCost;
-}
-
-/**
- * Extracts the energy contribution as a fraction of total energy supplied.
- *
- * @param view A policy outcome view.
- * @param source An energy source name; e.g., "solar" or "nuclear".
- * @returns The fraction of total consumed energy contributed by the source.
- */
-export function energyFraction(view: PolicyDataView, source: PolicyEnergySource) {
-  return view.summary.breakdown[source].energy / view.summary.energy;
-}
+///**
+// * Extracts the single-resource cost.
+// *
+// * @param view A policy outcome view.
+// * @param source A resource name; e.g., "solar" or "storage".
+// * @returns The cost of the given resource ($USD/MWh).
+// */
+//export function resourceCost(view: PolicyDataView, source: PolicyBreakdownEntry) {
+//  return totalCost(view) * costFraction(view, source);
+//}
+//
+///**
+// * Extracts the single-resource cost as a fraction of total scenario cost.
+// *
+// * @param view A policy outcome view.
+// * @param source A resource name; e.g., "solar" or "storage".
+// * @returns The fraction of total cost contributed by the given resource.
+// */
+//export function costFraction(view: PolicyDataView, source: PolicyBreakdownEntry) {
+//  return 0; // xxxx view.summary.breakdown[source].cost / view.summary.discountedCost;
+//}
+//
+///**
+// * Extracts the energy contribution as a fraction of total energy supplied.
+// *
+// * @param view A policy outcome view.
+// * @param source An energy source name; e.g., "solar" or "nuclear".
+// * @returns The fraction of total consumed energy contributed by the source.
+// */
+//export function energyFraction(view: PolicyDataView, source: PolicyEnergySource) {
+//  return view.summary.breakdown[source].energy / view.summary.energy;
+//}

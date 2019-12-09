@@ -6,7 +6,6 @@
     "d3": "registry:dt/d3#0.0.0+20160315011939",
     "jasmine": "registry:dt/jasmine#2.5.0+20161003201800",
     "ndarray": "file:typings/ndarray.d.ts",
-    "utility": "file:utility-mode/utility.d.ts",
-    "compare": "file:compare-mode/compare.d.ts"
+    "utility": "file:utility-mode/utility.d.ts"
   }
 }

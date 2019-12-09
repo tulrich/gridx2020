@@ -1,3 +1,13 @@
+# Starting from scratch:
+
+# cd to a parent directory
+# clone the git repo
+git clone https://github.com/tulrich/gridx2020.git
+
+# get deps
+npm install # update
+
+# build & run
 npm run-script build
 npm run-script serve-watch
 
@@ -7,6 +17,17 @@ pwd
 
 gulp && cp dist/material.js dist/material.min.js dist/material.css dist/material.min.css .
 
+
+# Git cheatsheet
+
+git status  # see what's going on
+git add .   # stage modified files for commit
+git commit  # commit to local repo
+
+# push changes to github
+git fetch origin master
+git rebase -i origin/master
+git push origin master
 
 
 
@@ -22,8 +43,10 @@ Theirs:
 
   * their dispatch model is much more sophisticated (minimum ramping
     rates of thermal sources, etc). My contention is this doesn't
-    really doesn't matter (physically) to any scenario with
-    significant batteries on the grid.
+    really doesn't matter (physically) because 1) batteries are coming
+    and 2) turbines can ramp 0 to 100% in 10-20 minutes. But I should
+    add accounting for fuel used for ramping and for spinning & cold
+    reserves (and credit batteries where they fill that role).
 
   * Runs optimization across sweeps of several variables: CO2, tech costs.
 

@@ -16,6 +16,7 @@ limitations under the License.
 import * as formatters from './formatters';
 import * as utility from './utility-mode/controller';
 import * as appendix from './components/layout';
+import * as tabs from './components/tabs';
 import * as util from './util';
 
 // The following imports need to be invoked at least once within the bundle
@@ -50,6 +51,7 @@ const utilityController = new utility.UtilityController(transitionDatasetUrl);
 window.addEventListener('load', event => {
   console.debug('window.load', event);
   appendix.initAppendixLinks();
+  tabs.init();
   utilityController.init();
   //xxx  policyController.fetchAndInit(policySchemaUrl, policyDatasetUrl);
 });

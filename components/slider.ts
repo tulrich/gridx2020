@@ -100,7 +100,7 @@ export class Slider {
     this._onChangeCallbacks = [];
     this._defaultValue = initialValue;
 
-    this._panel = this._container.closest('.mdl-tabs__panel');
+    this._panel = this._container.closest('.my-mdl-tabs__panel');
     if (this._panel) {
       let idval = this._panel.id;
       this._tab = document.querySelector(`a.mdl-tabs__tab[href='#${idval}']`);

@@ -145,7 +145,6 @@ export class UtilityController implements SliderNotifee {
   _defaultStateString: string;
 
   profileDataset: ProfileDataset;
-  profileDataset2: ProfileDataset;
   transitionDatasetUrl: string;
   _presetOptions: PresetOptionGroup<config.UtilityPresetOption>;
 
@@ -174,6 +173,20 @@ export class UtilityController implements SliderNotifee {
 	    });
           this._updateUrl();
         });
+
+    // Non-animated update. Doesn't seem to affect speed.
+    /*
+    this._animateDataView = (newView: UtilityDataView) => {
+      this._dataView = newView;
+      this._highlightProfilesChart.configureLayout(this._dataView);
+      this._co2ProfilesChart.configureLayout(this._dataView);
+      this._show(this._dataView);
+      this._components.forEach(c => {
+	  c.update(this._dataView)
+	});
+      this._updateUrl();
+    };
+    */
   }
 
   /**

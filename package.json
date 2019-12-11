@@ -9,7 +9,7 @@
     "rebuild": "npm run clean-all && npm run build-all",
     "clean": "rm -rf dist/",
     "prep": "typings install && mkdir -p dist && cat node_modules/material-design-lite/material.min.js node_modules/d3/d3.min.js node_modules/c3/c3.min.js node_modules/seedrandom/seedrandom.min.js > dist/lib.js",
-    "build-data": "cp -R data/ dist/data/",
+    "build-data": "cp -R data/ dist/data/ && cp favicon.ico dist/",
     "build-css": "cat node_modules/material-design-lite/material.min.css node_modules/c3/c3.min.css css/*.css > dist/bundle.css",
     "watch-css": "node_modules/catw/bin/cmd.js node_modules/material-design-lite/material.min.css node_modules/c3/c3.min.css 'css/*.css' -o dist/bundle.css",
     "build-html": "cat index.html > dist/index.html",

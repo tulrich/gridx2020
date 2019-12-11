@@ -161,14 +161,44 @@ function getCo2(energy: number, source: string): number {
 //   return energy * config.CO2_RATE[source] /* * transforms.WEEKS_PER_YEAR */;
 }
 
+const MAX_MEMOS = 10;
+let simulateGridMemos = [];
+
+function getMemo(params: ScenarioParameters, profiles: ProfileDataset) : ProfileDataset {
+  let pstr = JSON.stringify(params);
+  for (let i = simulateGridMemos.length - 1; i >= 0; i--) {
+    if (pstr == simulateGridMemos[i][0] && profiles == simulateGridMemos[i][1]) {
+      // Move the matching entry to the end of the array.
+      let resultEntry = simulateGridMemos.splice(i, 1)[0];
+      simulateGridMemos.push(resultEntry);
+      return resultEntry[2];
+    }
+  }
+  return null;
+}
+
+function addMemo(params: ScenarioParameters, profiles: ProfileDataset, result: ProfileDataset) {
+  while (simulateGridMemos.length >= MAX_MEMOS) {
+    simulateGridMemos.shift();
+  }
+  simulateGridMemos.push([JSON.stringify(params), profiles, result]);
+}
 
 export function simulateGrid(
     params: ScenarioParameters,
     profiles: ProfileDataset): ProfileDataset {
   ;
+  // Return memoized result if available.
+  let memoResult = getMemo(params, profiles);
+  if (memoResult) {
+    return memoResult;
+  }
+
+  let startTime = (new Date()).getTime();
+
   // TODO
 
-  // debug MT vs gCO2e/KWh
+  // Report and/or graph spilled MWh
 
   // Separate out the sliders for each source (to facilitate version changes)
   //   * add initial growth rate (for trajectory in years before build time)
@@ -178,7 +208,7 @@ export function simulateGrid(
 
   // Show all graphs button
 
-  // Chip showing source plan thumbnailsZ
+  // Chip showing source plan thumbnails
 
   // Report grid share based on dispatch (?)
 
@@ -341,13 +371,14 @@ export function simulateGrid(
   // Given the non-dispatchable energy supply profiles, which are fixed,
   // compute the available dispatchable energy supply profile and remaining
   // unmet demand profile.
-  const unmetProfile = [];
+  const unmetProfile = (new Array(scaledDemand.length) as Array<number>)['fill'](0.);
   const dispatchProfile = {
-  	ng: [],
-	battery: [],
-	h2: [],
+    ng: (new Array(scaledDemand.length))['fill'](0.),
+    battery: (new Array(scaledDemand.length))['fill'](0.),
+    h2: (new Array(scaledDemand.length))['fill'](0.),
   };
-  const supplyProfile = [];
+  const supplyProfile = (new Array(scaledDemand.length))['fill'](0.);
+  const acceptedForStorageProfile = (new Array(scaledDemand.length))['fill'](0.);
   let storageState = {
       battery: 0.,
       h2: 0.,
@@ -373,70 +404,70 @@ export function simulateGrid(
     }
 
     let mwhThisYear = 0;
-    for (let i = j; i < j1; i++) {
-      // Find the total power supplied at time[i] for non-dispatchables.
-      let supplied = 0;
-      config.NON_DISPATCHABLE_ENERGY_SOURCES.forEach(name => {
-          supplied += normalizedProfiles[name][i];
-        });
 
-      let demand = scaledDemand[i];
-      // Any remaining gap beteween demand[i] and sum(non_dispatchable[k][i])
-      // needs to be fulfilled by a dispatchable power supply or it goes
-      // unfulfilled.
-      let needed = Math.max(demand - supplied, 0);
+    config.NON_DISPATCHABLE_ENERGY_SOURCES.forEach(name => {
+	let sourceProfile = normalizedProfiles[name];
+	for (let i = j; i < j1; i++) {
+	  supplyProfile[i] += sourceProfile[i];
+	}
+      });
 
-      let dispatched = 0;
-      let unmet = 0;
-      config.STORAGE_ENERGY_SOURCES.forEach(name => {
-          let sourceSupplied = 0.;
-          let sourceAvailable = normalizedProfiles[name][i];
-          sourceAvailable = Math.min(sourceAvailable, storageState[name]);
-          sourceSupplied = Math.min(needed, sourceAvailable);
-          storageState[name] -= sourceSupplied;
-          needed -= sourceSupplied;
-          dispatched += sourceSupplied;
-          dispatchProfile[name].push(sourceSupplied);
-        });
-      config.DISPATCHABLE_ENERGY_SOURCES.forEach(name => {
-          let sourceSupplied = 0.;
-          let sourceAvailable = normalizedProfiles[name][i];
-          sourceSupplied = Math.min(needed, sourceAvailable);
-          needed -= sourceSupplied;
-          dispatched += sourceSupplied;
-          dispatchProfile[name].push(sourceSupplied);
-        });
-
-      if (needed > 0) {
-        unmet = needed;
-      }
-
-      // Add any additional energy that was dispatched to meet demand.
-      supplied += dispatched;
-
-      let excess = supplied - demand;
-      // Store some energy, if possible.
-      config.STORAGE_ENERGY_SOURCES.forEach(name => {
-          if (excess > 0) {
-            let efficiency = params.source[name].storageRoundTripEfficiency;
-            let capacity = normalizedProfiles[name][i] * params.source[name].storageHours;
-            let maxRemainingCapacity = capacity - storageState[name];
+    config.STORAGE_ENERGY_SOURCES.forEach(name => {
+	let efficiency = params.source[name].storageRoundTripEfficiency;
+	let sourceProfile = normalizedProfiles[name];
+	let thisDispatchProfile = dispatchProfile[name];
+	let hours = params.source[name].storageHours;
+	let capacity = sourceProfile[j] * hours;
+	let state = storageState[name];
+	for (let i = j; i < j1; i++) {
+	  let excess = supplyProfile[i] - scaledDemand[i];
+	  if (excess < 0) {
+	    // Supply from storage.
+	    let sourceSupplied = 0.;
+	    let sourceAvailable = sourceProfile[i];
+	    sourceAvailable = Math.min(sourceAvailable, state);
+	    sourceSupplied = Math.min(-excess, sourceAvailable);
+	    state -= sourceSupplied;
+	    supplyProfile[i] += sourceSupplied;
+	    thisDispatchProfile[i] = sourceSupplied;
+	  } else if (excess > 0) {
+	    // Charge storage.
+	    let maxRemainingCapacity = capacity - state;
             let maxAccept = Math.min(
-                                     normalizedProfiles[name][i],
+                                     sourceProfile[i],
                                      maxRemainingCapacity / efficiency);
             let accept = Math.max(0, Math.min(excess * efficiency, maxAccept));
-            storageState[name] += accept;
-            excess -= accept / efficiency;
-          }
-        });
+            state += accept;
+	    acceptedForStorageProfile[i] += accept / efficiency;
+	  }
+	}
+	storageState[name] = state;
+      });
 
-      unmetProfile.push(unmet);
-      supplyProfile.push(supplied);
-      mwhThisYear += supplied;
-      if (excess > 0) {
-        mwhThisYear -= excess;
+    let name = 'ng';
+    let sourceProfile = normalizedProfiles[name];
+    let thisDispatchProfile = dispatchProfile[name];
+    for (let i = j; i < j1; i++) {
+      let excess = supplyProfile[i] - scaledDemand[i];
+      if (excess < 0) {
+	// Dispatch.
+	let sourceAvailable = sourceProfile[i];
+	if (sourceAvailable >= -excess) {
+	  let sourceSupplied = -excess;
+	  thisDispatchProfile[i] = sourceSupplied;
+	  supplyProfile[i] += sourceSupplied;
+	} else {
+	  let sourceSupplied = sourceAvailable;
+	  thisDispatchProfile[i] = sourceSupplied;
+	  supplyProfile[i] += sourceSupplied;
+	  unmetProfile[i] = scaledDemand[i] - supplyProfile[i];
+	}
       }
-      //xxx TODO storedProfile.push(stored);
+      if (scaledDemand[i] <= supplyProfile[i] - acceptedForStorageProfile[i]) {
+	mwhThisYear += scaledDemand[i];
+      } else {
+	mwhThisYear += supplyProfile[i] - acceptedForStorageProfile[i];
+      }
     }
 
     // Update costs.
@@ -477,7 +508,10 @@ export function simulateGrid(
     zeroSeries[i] = 0;
   }
 
-  return {
+  let endTime = (new Date()).getTime();
+  //console.log("simulateGrid time: " + (endTime - startTime) + " ms");
+
+  let result = {
     index: profiles.index,
     units: profiles.units,
     series: {
@@ -510,6 +544,9 @@ export function simulateGrid(
     sumDiscountedCost: sumDiscountedCost,
     sumDiscountedMwh: sumDiscountedMwh,
   };
+
+  addMemo(params, profiles, result);
+  return result;
 }
 
 /**

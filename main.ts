@@ -28,11 +28,11 @@ import 'url-search-params-polyfill';
 polyfill();
 //formatters.configure();
 
-const utilityDatasetUrl = 'data/utility-dataset.json';
-// From https://github.com/google/energysimulation/tree/master/gridsim/data/profiles
-const transitionDatasetUrl = 'data/profiles_neiso.csv';
-//xxx const policyDatasetUrl = 'data/policy-dataset.csv';
-//xxx const policySchemaUrl = 'data/policy-schema.json';
+//// From https://github.com/google/energysimulation/tree/master/gridsim/data/profiles
+//const transitionDatasetUrl = 'data/profiles_neiso.csv';
+
+// From NE-ISO, after processing by inputdata/prepare.py (see inputdata/README.txt)
+const transitionDatasetUrl = 'data/iso-ne-hourly-demand-solar-wind-2013-2018.csv';
 
 //// By default, switching tabs does not reset the scroll to the top of the new
 //// newly opened tab in MDL.

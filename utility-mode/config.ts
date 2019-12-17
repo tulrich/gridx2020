@@ -14,7 +14,7 @@ limitations under the License.
 ==============================================================================*/
 
 
-// CO2 emissions (Mt) for business-as-usual.
+// CO2 emissions (Mt) for arbitrary default scenario (growing demand, RE deployment approx covers growth).
 export const CO2_EMISSIONS_BAU = 653e6;
 // CO2 emissions (Mt) goal.
 export const CO2_EMISSIONS_GOAL = 265e6;  // <-- 2017 CO2 * 15 years / 2, i.e. linear ramp to 0 in 15 years.
@@ -505,12 +505,12 @@ export type UtilityPresetOption = 'DEFAULT' | 'RE' | 'NUCLEAR' | 'NO_H2' | 'FLAT
 export const PRESET_ALLOCATIONS:
     {[K in UtilityPresetOption]: string} = {
   // Default.
-  DEFAULT: "ASAECQgTBAkKEwIJAhMGCQYTJQkxEwAEABMACQATAAkAEw==",
-  RE: "AiAKBBULCgcPEwIJAhMGDAYTHgYCEwAAABMCCAYTAwQyEw==",
-  NUCLEAR: "AiAJBAADCAcAEwIJAhMVBiMTHgwCEwAAABMJCAATBAQ1Ew==",
-  NO_H2: "#AiANBRwTDQgUEwIJAhMGCQYTJQkxEwAEABMnCGQTAAUAEw==",
-  FLAT: "Am8gFAACABMAEwALBQAoEh1iAgETABMADhAAKA8TXwQCCQITAx4UAxlBMWIPBgkGEwVePxMjHjFbRhoJGxMACARMHqsTXwABEwATBDkeJR7IJ18AAAkAEwANDQAoChNiUAMAAAkAEwEVCgsoDhNfIC8=",
-  GAS: "AiAAAAATAAAAEwIJAhMGCQYTKQk5EwATABMACQATAAkAEw==",
+  DEFAULT: "AiADCQcTAwkJEwIJAhMGCQYTJQk1EwAEABMACQATAAkAEw==",
+  RE: "AiAOBhQTCAMSEwIJAhMGDAYTIAoFEwAAABMECAUTAwctEw==",
+  NUCLEAR: "AiAABAADFQcAEQIJAhMPBiUTIAUAEwAAABMJCAATBAQfEw==",
+  NO_H2: "Am8gGgABDgUZEwAKBQAoEh1iAg0IFRMADRAAKA8TXwQCCQITAx4UAxlBMWIPBgkGEwVgPBgjHidbRh4JJBMACAdIHqsTXwEABAATBC4fJh7IJ18AFQlIEwAWEwAoChNiUAcAAAUAEwEVCgsoDhNfIC8=",
+  FLAT: "Am8gFAACABMAEwAKBQAoEh1iAgETABMADRAAKA8TXwQCCQITAx4UAxlBMWIPBgkGEwVgPBgjHidbRhwJHBMACAdIHqsTXwABEwATBC4fJh7IJ18AAAkAEwANDQAoChNiUAMAAAkAEwEVCgsoDhNfIC8=",
+  GAS: "AiAAAAATARMBEwIJAhMGCQYTKwk5EwATABMACQATAAkAEw==",
 };
 
 // Categorization of energy sources by dispatch capability.
@@ -522,7 +522,5 @@ export const DISPATCHABLE_ENERGY_SOURCES: UtilityEnergySource[] = [
                                                                    'ng'];
 export const ALL_ENERGY_SOURCES: UtilityEnergySource[] = (
     DISPATCHABLE_ENERGY_SOURCES.concat(NON_DISPATCHABLE_ENERGY_SOURCES)).concat(STORAGE_ENERGY_SOURCES);
-// Not all energy sources have a corresponding slider directly controlling;
-// fossil fuel-based sources have multiple variants (ccs/non-ccs).
 export const SLIDER_ENERGY_SOURCES: UtilityEnergySource[] = [
     'solar', 'wind', 'hydro', 'nuclear', 'coal', 'ng', 'battery', 'h2'];

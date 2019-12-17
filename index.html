@@ -561,607 +561,329 @@ limitations under the License.
       <!-- About appendix -->
       <div class="appendix hidden" id="about-appendix">
         <h1>About</h1>
-        <!-- <div class="mdl-grid"> -->
-          <!-- <div class="mdl-cell mdl-cell--8-col"> -->
+        <p>
+          This web page is an interactive model of the New England
+          electricity grid. It projects power supply and demand
+          from 2020 through 2040 and lets you adjust plans to
+          build or retire various sources of electricity, to see
+          the cost and carbon impacts. The goal is to help people
+          concerned about climate change explore and communicate
+          our options.
+        </p>
 
-            <p>
-              This web page is an interactive model of the New England
-              electricity grid. It projects power supply and demand
-              from 2020 through 2040 and lets you adjust plans to
-              build or retire various sources of electricity, to see
-              the cost and carbon impacts. The goal is to help people
-              concerned about climate change explore and communicate
-              our options.
-            </p>
+        <p>
+          The model is designed to be simple enough to play with,
+          but detailed enough to draw plausible conclusions. The
+          top part of the model display can show projected
+          electricity demand and supply for the New England grid
+          (ISO-NE) for one of 20 years with monthly averages, or 1
+          week with hourly values (either the first week with
+          missed demand, or the week with highest demand if demand
+          is satisfied), or 20 years of CO2 emissions along with a
+          cost summary.
+        </p>
 
-            <p>
-              The model is designed to be simple enough to play with,
-              but detailed enough to draw plausible conclusions. The
-              top part of the model display can show projected
-              electricity demand and supply for the New England grid
-              (ISO-NE) for one of 20 years with monthly averages, or 1
-              week with hourly values (either the first week with
-              missed demand, or the week with highest demand if demand
-              is satisfied), or 20 years of CO2 emissions along with a
-              cost summary.
-            </p>
+        <p>Below the output display, there are 8 tabs for the 8
+          modeled electricity generation sources: solar, wind,
+          hydroelectric, nuclear, natural gas, coal, batteries,
+          and hydrogen. Click on a tab to adjust the controls for
+          that source. The <b>plan</b> sliders are controls for
+          future decisions about changing the capacity of the
+          source. Below the plan sliders are
+          the <b>assumptions</b> sliders, which reflect my
+          understanding of the characteristics of the
+          source. These parameters determine the intitial
+          conditions of the model as well as the costs,
+          capabilties, time constraints, and CO2 impacts of the
+          source. You can adjust these assumptions to account for
+          better information, to model a different scenario than
+          the default, or just to explore. When assumption sliders
+          have been changed from the defaults, they are
+          highlighted so you know that the outcome might not be
+          comparable to plans under the default assumptions.
+        </p>
 
-            <p>Below the output display, there are 8 tabs for the 8
-              modeled electricity generation sources: solar, wind,
-              hydroelectric, nuclear, natural gas, coal, batteries,
-              and hydrogen. Click on a tab to adjust the controls for
-              that source. The <b>plan</b> sliders are controls for
-              future decisions about changing the capacity of the
-              source. Below the plan sliders are
-              the <b>assumptions</b> sliders, which reflect my
-              understanding of the characteristics of the
-              source. These parameters determine the intitial
-              conditions of the model as well as the costs,
-              capabilties, time constraints, and CO2 impacts of the
-              source. You can adjust these assumptions to account for
-              better information, to model a different scenario than
-              the default, or just to explore. When assumption sliders
-              have been changed from the defaults, they are
-              highlighted so you know that the outcome might not be
-              comparable to plans under the default assumptions.
-            </p>
+        <p>As you change the controls, the webpage URL captures
+          the slider positions. If you save or share the URL,
+          re-opening the URL will restore your settings and show
+          the resulting outcome. If you want to return to the
+          defaults, you can use the Default button at the bottom
+          of the page, or double-click on the individual sliders.
+        </p>
 
-            <p>As you change the controls, the webpage URL captures
-              the slider positions. If you save or share the URL,
-              re-opening the URL will restore your settings and show
-              the resulting outcome. If you want to return to the
-              defaults, you can use the Default button at the bottom
-              of the page, or double-click on the individual sliders.
-            </p>
+        <h2>Caveats</h2>
 
-            <h2>Caveats</h2>
+        <ul>
+          <li>Numbers and code haven't been fully reviewed and
+            validated, expect revisions.</li>
 
-            <ul>
-              <li>Numbers and code haven't been fully reviewed and
-              validated, expect revisions.</li>
+          <li>This tool does not optimize, it just shows you the
+            results of the plan that you give it. Planning &
+            optimizing is up to you.</li>
 
-              <li>The demand and wind/solar production profiles are
-              based on replicating one year 20 times. I will attempt
-              to fix this as soon as possible.</li>
+          <li>There's no attempt to model locational value or
+            import/export.</li>
 
-              <li>This tool does not optimize, it just shows you the
-              results of the plan that you give it. Planning &
-              optimizing is up to you.</li>
+          <li>LCOE and CO2 are for the period 2020-2040. The
+            initial fleet is inherited at no cost, and there's no
+            value ascribed to the fleet at the end of 2039. Watch
+            for boundary effects.</li>
 
-              <li>There's no attempt to model locational value or
-              import/export.</li>
+          <li>No spinning reserve or capacity reserve requirements
+	    are modelled.  Real grid operators would build more
+	    capacity than what this model requires and so costs
+	    would be a bit higher.</li>
 
-              <li>LCOE and CO2 are for the period 2020-2040. The
-              initial fleet is inherited at no cost, and there's no
-              value ascribed to the fleet at the end of 2039. Watch
-              for boundary effects.</li>
+          <li>The gas model is based on simple cycle turbines,
+            which are cheap and ramp fast but burn more gas per kWh
+            than combined cycle.</li>
 
-              <li>No spinning reserve or capacity reserve requirements
-	      are modelled.  Real grid operators would build more
-	      capacity than what this model requires and so costs
-	      would be a bit higher.</li>
+          <li>Initial conditions are based on 2017 grid mix which
+            surely underestimates initial wind and solar. The model
+            also does not capture in detail current construction in
+            progress as of 2020, or the age of the existing fleet in
+            2020. This probably penalizes solar & wind scenarios
+            somewhat.
+          </li>
+        </ul>
 
-              <li>The gas model is based on simple cycle turbines,
-              which are cheap and ramp fast but burn more gas per kWh
-              than combined cycle.</li>
+        <h2>Details</h2>
+        <p>
+          The demand profile
+	  is <a href="https://www.iso-ne.com/isoexpress/web/reports/load-and-demand/-/tree/zone-info">
+	    observed hourly data</a> from 6 years (2013-2018) of the
+	  New England electricity grid (ISO-NE), along with
+	  the <a href="https://www.iso-ne.com/isoexpress/web/reports/operations/-/tree/daily-gen-fuel-type">
+	    hourly solar and wind production</a> for the same
+	  hours. The profiles were preprocessed to normalize
+	  annual demand and solar/wind capacity (see
+	  inputdata/prepare.py).
+	</p>
 
-              <li>Initial conditions are based on 2017 grid mix which
-              surely underestimates initial wind and solar. The model
-              also does not capture in detail current construction in
-              progress as of 2020, or the age of the existing fleet in
-              2020. This probably penalizes solar & wind scenarios
-              somewhat.
-              </li>
-            </ul>
+	<p>
+	  I chose ISO-NE partly because it is a challenging case
+          for wind and solar. If renewable energy can decarbonize
+          ISO-NE, it can work in many other places.
+        </p>
 
-            <h2>Details</h2>
-            <p>
-              The demand profile is observed hourly data drawn from
-              one year (2015) of the New England electricity grid
-              (ISO-NE), along with hourly solar and wind production
-              for that year. I chose ISO-NE partly because it is a
-              challenging case for wind and solar. If renewable energy
-              can decarbonize ISO-NE, it can work in many other
-              places.
-            </p>
-            <p>
-              To get 20 years of data, the one year of profiles are
-              repeated 20 times. In the future I would like to update
-              this with 20 years of observed demand and
-              weather-derived solar/wind production profiles. Demand
-              is scaled by the (adjustable) demand growth rate, to
-              model economic growth and coming changes like EV
-              charging, heat pumps for heating, and electrification of
-              industry.
-            </p>
+        <p>
+          To get 20 years of data, the six year profiles are
+          repeated 3.33 times.  Demand is scaled by the
+          (adjustable) demand growth rate, to model economic
+          growth and coming changes like EV charging, heat pumps
+          for heating, and electrification of industry.
+        </p>
 
-            <h2>CO2 outcomes reported by the tool</h2>
-            <p>
-              The CO2 budget for 2020-2040 is chosen as 2020 emissions
-              times 7.5. This is represents ramping emissions from
-              present rate down to zero over 15 years. I believe this
-              is roughly compatible with 1.5C warming scenarios
-              (assuming similar reductions across the world and across
-              other sectors). Please let me know if you have a better
-              rationale & target. [TODO footnote]
-            </p>
+        <h2>CO2 outcomes reported by the tool</h2>
+        <p>
+          The CO2 budget for 2020-2040 is chosen as 2020 emissions
+          times 7.5. This is represents ramping emissions from
+          present rate down to zero over 15 years. I believe this
+          is roughly compatible with 1.5C warming scenarios
+          (assuming similar reductions across the world and across
+          other sectors). Please let me know if you have a better
+          rationale & target. [TODO footnote]
+        </p>
 
-            <p>
-              The CO2 reported is total lifecycle CO2 emissions from
-              electricity generation in ISO-NE over the 20-year
-              timespan of the simulation. It also includes (smaller)
-              effects of direct waste heat and water vapor
-              emissions. <a href="">[MZJ 2019]</a> gives a range of
-              values for various sources, broken out by lifecycle,
-              thermal and water vapor, and other categories.
-            </p>
+        <p>
+          The CO2 reported is total lifecycle CO2 emissions from
+          electricity generation in ISO-NE over the 20-year
+          timespan of the simulation. It also includes (smaller)
+          effects of direct waste heat and water vapor
+          emissions. <a href="">[MZJ 2019]</a> gives a range of
+          values for various sources, broken out by lifecycle,
+          thermal and water vapor, and other categories.
+        </p>
 
-            <p>Lifecycle analysis for a source includes the CO2
-              impacts of the processes used to construct the source,
-              and is notoriously tricky to pin down because there are
-              so many variables. One of the most important variables
-              is the CO2 intensity of the electricity grid used by the
-              factories making the materials in a source. For
-              fossil-fuel sources this is less tricky because the
-              direct fuel emissions dominate. But for solar, wind and
-              nuclear, the range of estimates is large. For the
-              purpose of this model, which reports system CO2 across
-              the whole grid, my solution for the solar, wind and
-              nuclear values is to use the low end of reported
-              lifecycle CO2 intensity, plus whatever (small) direct
-              emissions are involved. The justification is that the
-              CO2 from low-carbon sources does not significantly add
-              to system CO2 until the system becomes relatively
-              decarbonized. But as that happens, the CO2 impact of
-              industrial production should similarly decline. This
-              does not correctly handle effects of plant build and
-              lifetimes but it's simple and I think it leads to
-              reasonable results.
-            </p>
+        <p>Lifecycle analysis for a source includes the CO2
+          impacts of the processes used to construct the source,
+          and is notoriously tricky to pin down because there are
+          so many variables. One of the most important variables
+          is the CO2 intensity of the electricity grid used by the
+          factories making the materials in a source. For
+          fossil-fuel sources this is less tricky because the
+          direct fuel emissions dominate. But for solar, wind and
+          nuclear, the range of estimates is large. For the
+          purpose of this model, which reports system CO2 across
+          the whole grid, my solution for the solar, wind and
+          nuclear values is to use the low end of reported
+          lifecycle CO2 intensity, plus whatever (small) direct
+          emissions are involved. The justification is that the
+          CO2 from low-carbon sources does not significantly add
+          to system CO2 until the system becomes relatively
+          decarbonized. But as that happens, the CO2 impact of
+          industrial production should similarly decline. This
+          does not correctly handle effects of plant build and
+          lifetimes but it's simple and I think it leads to
+          reasonable results.
+        </p>
 
-            <p>Values by source, in gCO2e/kWh:</p>
-            <ul>
-              <li>solar: 8</li>
-              <li>wind: 5</li>
-              <li>hydro: 31</li>
-              <li>nuclear: 13</li>
-              <li>gas: 447 (adjusted in validation process below)</li>
-              <li>coal: 927</li>
-              <li>battery: 0</li>
-              <li>h2: 4 (direct emissions from turbines)</li>
-            </ul>
+        <p>Values by source, in gCO2e/kWh:</p>
+        <ul>
+          <li>solar: 8</li>
+          <li>wind: 5</li>
+          <li>hydro: 31</li>
+          <li>nuclear: 13</li>
+          <li>gas: 447 (adjusted in validation process below)</li>
+          <li>coal: 927</li>
+          <li>battery: 0</li>
+          <li>h2: 4 (direct emissions from turbines)</li>
+        </ul>
 
-            <h2>Cost outcomes reported by the tool</h2>
-            <p>
-              The costs are derived by computing the timing and size
-              of expenditures for plant construction, operation, and
-              fuel, discounted by the specified discount rate
-              according to the year in which they occur. To compute
-              the
-              <a href="https://en.wikipedia.org/wiki/Cost_of_electricity_by_source#Levelized_cost_of_electricity">
-                Levelized Cost of Electricity
-              </a>
-              (LCOE), the discounted expenditure is divided by the
-              discounted energy delivered to the grid. This does not
-              include the construction cost for the initial fleet of
-              sources, and does not credit the value and costs of the
-              fleet or energy generated after 2040.
-            </p>
-            <p>
-              Because the tool is computing LCOE of generation, it
-              does not give retail rates or do any market
-              analysis. Retail rates are usually much higher and have
-              to cover the cost of operating and maintaining the grid,
-              among other things. However, cost of generation is a key
-              driver of prices charged to customers.
-            </p>
+        <h2>Cost outcomes reported by the tool</h2>
+        <p>
+          The costs are derived by computing the timing and size
+          of expenditures for plant construction, operation, and
+          fuel, discounted by the specified discount rate
+          according to the year in which they occur. To compute
+          the
+          <a href="https://en.wikipedia.org/wiki/Cost_of_electricity_by_source#Levelized_cost_of_electricity">
+            Levelized Cost of Electricity
+          </a>
+          (LCOE), the discounted expenditure is divided by the
+          discounted energy delivered to the grid. This does not
+          include the construction cost for the initial fleet of
+          sources, and does not credit the value and costs of the
+          fleet or energy generated after 2040.
+        </p>
+        <p>
+          Because the tool is computing LCOE of generation, it
+          does not give retail rates or do any market
+          analysis. Retail rates are usually much higher and have
+          to cover the cost of operating and maintaining the grid,
+          among other things. However, cost of generation is a key
+          driver of prices charged to customers.
+        </p>
 
-            <h2>Energy generation cost assumptions</h2>
-            <h3>Power Sources</h3>
-            <p>
-              For all power sources, we model costs arising from the following sources:
-            </p>
-            <ul>
-              <li>
-                Capital: Cost to build the plant ($ per Watt of capacity)
-              </li>
-              <li>
-                Fixed: Cost to operate and maintain the plant ($ per Kilowatt of capacity per year)
-              </li>
-              <li>
-                Variable: Cost of fuel, operations and maintenance to
-                generate energy ($ per Megawatt hour).
-              </li>
-            </ul>
+        <h2>Energy generation cost assumptions</h2>
+        <h3>Power Sources</h3>
+        <p>
+          For all power sources, we model costs arising from the following sources:
+        </p>
+        <ul>
+          <li>
+            Capital: Cost to build the plant ($ per Watt of capacity)
+          </li>
+          <li>
+            Fixed: Cost to operate and maintain the plant ($ per Kilowatt of capacity per year)
+          </li>
+          <li>
+            Variable: Cost of fuel, operations and maintenance to
+            generate energy ($ per Megawatt hour).
+          </li>
+        </ul>
 
-            <p>The default capital, fixed and variable cost values for the sources are:</p>
-            <ul>
-              <li>Solar: $1.0/W, $10.5/KW/y, $0/MWh, 30y life.</li>
-              <li>Wind: $1.3/W, $32/KW/y, $0/MWh, 20y life.</li>
-              <li>Hydro: $2.95/W, $40.85/KW/y, $1.36/MWh, 50y life.</li>
-              <li>Nuclear: $9.55/W, $120/KW/y, $12.0/MWh, 40y life.</li>
-              <li>Gas: $0.825/W, $13.1/KW/y, $36.2/MWh, 20y life.</li>
-              <li>Coal: $4.62/W, $61.1/KW/y, $18.9/MWh, 40y life.</li>
-              <li>Battery (4hr): $1.26/W, $26.8/KW/y, $0/MWh, 20y life.</li>
-              <li>H2 (720hr): $2.08/W, $20/W, $5.5/MWh, 20y life.</li>
-            </ul>
-            <p>The solar (PV crystalline), wind (onshore), gas
-            (peaking), nuclear, coal and battery (lithium) values are
-            derived
-            from <a href="https://www.lazard.com/media/451086/lazards-levelized-cost-of-energy-version-130-vf.pdff">[Lazard v13
+        <p>The default capital, fixed and variable cost values for the sources are:</p>
+        <ul>
+          <li>Solar: $1.0/W, $10.5/KW/y, $0/MWh, 30y life.</li>
+          <li>Wind: $1.3/W, $32/KW/y, $0/MWh, 20y life.</li>
+          <li>Hydro: $2.95/W, $40.85/KW/y, $1.36/MWh, 50y life.</li>
+          <li>Nuclear: $9.55/W, $120/KW/y, $12.0/MWh, 40y life.</li>
+          <li>Gas: $0.825/W, $13.1/KW/y, $36.2/MWh, 20y life.</li>
+          <li>Coal: $4.62/W, $61.1/KW/y, $18.9/MWh, 40y life.</li>
+          <li>Battery (4hr): $1.26/W, $26.8/KW/y, $0/MWh, 20y life.</li>
+          <li>H2 (720hr): $2.08/W, $20/W, $5.5/MWh, 20y life.</li>
+        </ul>
+        <p>The solar (PV crystalline), wind (onshore), gas
+          (peaking), nuclear, coal and battery (lithium) values are
+          derived
+          from <a href="https://www.lazard.com/media/451086/lazards-levelized-cost-of-energy-version-130-vf.pdff">[Lazard v13
             2019]</a> by taking the average value of the cost & time
-            ranges.  Hydro values are derived
-            from <a href="https://www.eia.gov/outlooks/aeo/assumptions/pdf/table_8.2.pdf">[EIA
+          ranges.  Hydro values are derived
+          from <a href="https://www.eia.gov/outlooks/aeo/assumptions/pdf/table_8.2.pdf">[EIA
             Outlook 2019]</a>.
 
-            The H2 values are based
-            on <a href="https://www.hydrogen.energy.gov/pdfs/14004_h2_production_cost_pem_electrolysis.pdf">[energy.gov]</a>
-            for PEM
-            electrolyzers, <a href="https://prod-ng.sandia.gov/techlib-noauth/access-control.cgi/2011/114845.pdf">[Sandia]</a>
-            for salt cavern storage, and assumes turbine costs are
-            similar to gas turbines.</p>
+          The H2 values are based
+          on <a href="https://www.hydrogen.energy.gov/pdfs/14004_h2_production_cost_pem_electrolysis.pdf">[energy.gov]</a>
+          for PEM
+          electrolyzers, <a href="https://prod-ng.sandia.gov/techlib-noauth/access-control.cgi/2011/114845.pdf">[Sandia]</a>
+          for salt cavern storage, and assumes turbine costs are
+          similar to gas turbines.</p>
 
-            <h2>CO2 Intensity Assumptions</h2>
-            <p>
-              The CO2 intensities are lifecycle plus thermal & water
-              vapor values, expressed in units of gCO2e/kWh.
-            </p>
+        <h2>CO2 Intensity Assumptions</h2>
+        <p>
+          The CO2 intensities are lifecycle plus thermal & water
+          vapor values, expressed in units of gCO2e/kWh.
+        </p>
 
-            <h2>Validation</h2>
-            <p>
-              This model has not been validated by others; it
-              certainly has errors and inaccuracies. I would
-              appreciate corrections.
-            </p>
-            <p>
-              I did do a very basic validation based on the 2017 ISO
-              emissions reported
-              at <a href="https://www.iso-ne.com/static-assets/documents/2019/04/2017_emissions_report.pdf">[iso-ne.com]</a>.
-              The report gives a grid mix of 48% gas, 1% oil, 2% coal,
-              31% nuclear, 7% hydro, 7% other renewables (trash,
-              biomass, etc), 3% wind, and ~1% solar. Production was
-              102,500 GWh, with 31.7 Mt CO2 produced, and average of
-              309 g/kWh. I checked and tweaked the initial values in
-              this model to produce a similar result. (I added the oil
-              and other renewables production to gas.)
-            </p>
+        <h2>Validation</h2>
+        <p>
+          This model has not been validated by others; it
+          certainly has errors and inaccuracies. I would
+          appreciate corrections.
+        </p>
+        <p>
+          I did do a very basic validation based on the 2017 ISO
+          emissions reported
+          at <a href="https://www.iso-ne.com/static-assets/documents/2019/04/2017_emissions_report.pdf">[iso-ne.com]</a>.
+          The report gives a grid mix of 48% gas, 1% oil, 2% coal,
+          31% nuclear, 7% hydro, 7% other renewables (trash,
+          biomass, etc), 3% wind, and ~1% solar. Production was
+          102,500 GWh, with 31.7 Mt CO2 produced, and average of
+          309 g/kWh. I checked and tweaked the initial values in
+          this model to produce a similar result. (I added the oil
+          and other renewables production to gas.)
+        </p>
 
-            <h2>Acknowledgements</h2>
+        <h2>Carbon capture and sequestration (CCS)</h2>
+        <p>
+          I'm a bit skeptical of CCS so I didn't include it
+          explicitly in the tool.  However, you are encouraged to
+          adjust the assumptions for Natural Gas and Coal to
+          explore the effects of CCS.
+        </p>
 
-            <p>Grid Transition is by Thatcher Ulrich, based heavily on
-              the wonderful
-              <a href="https://google.github.io/energystrategies/">Energy
-                Strategies</a> tool released in 2016.
-            </p>
+        <h2>Transmission</h2>
+        <p>
+          For simplicity I omitted transmittion and location from
+          the model. This makes the grid balancing easier because
+          it's assumed that generation is always close to use. But
+          it makes grid balancing harder because there is no
+          provision for import/export of electricity to
+          neighboring grids. ISO-NE actually imports a significant
+          percentage of electrity from Ontario, New Brunswick, and
+          New York, but that complicates the modeling and makes it
+          less useful as a proxy for other grids. The intention is
+          to make it slightly harder to decarbonize the model than
+          to decarbonize a real grid with ability to
+          import/export.
+        </p>
 
-            <p>
-              Energy Strategies: concept, design and development by
-              Amber Robson, Corrie Scalisi, Doug Fritz, Drew Bryant,
-              John Platt, Jonny Mack, Josh Freed, Kate Brandt, Matt
-              Jones, Michael Terrell, Orion Pritchard, Philippe
-              Larochelle, Ross Koningstein, Ryan Fitzpatrick and
-              Saleem Van Groenou.
-            </p>
+        <h2>Hydropower</h2>
+        <p>
+          I modeled hydropower as a constant flat source. This is
+          not realistic -- depending on the facility, hydro can
+          have a lot of dispatchability and storage features, and
+          at other times can be constrained by weather and
+          environmental requirements. But, those complexities are
+          very particular to local conditions and work against
+          applying the results of this tool to other grids around
+          the world, so I chose to keep the hydro model very
+          basic.
+        </p>
 
-            <!--
-            <table class="appendix-table">
-              <thead>
-                <tr>
-                  <td>Source</td><td>Capital ($ / kW)</td><td>Fixed ($ / kW-year)</td>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>Solar Optimistic Future</td>
-                  <td>630<sup>4</sup></td>
-                  <td>21.66<sup>1</sup></td>
-                </tr>
-                <tr>
-                  <td>Solar Moderate Future</td>
-                  <td>1040<sup>4</sup></td>
-                  <td>21.66<sup>1</sup></td>
-                </tr>
-                <tr>
-                  <td>Solar Today</td>
-                  <td>2277<sup>1</sup></td>
-                  <td>21.66<sup>1</sup></td>
-                </tr>
-                <tr>
-                  <td>Wind Optimistic Future</td>
-                  <td>1370<sup>4</sup></td>
-                  <td>46.71<sup>1</sup></td>
-                </tr>
-                <tr>
-                  <td>Wind Moderate Future</td>
-                  <td>1500<sup>4</sup></td>
-                  <td>46.71<sup>1</sup></td>
-                </tr>
-                <tr>
-                  <td>Wind Today</td>
-                  <td>1686<sup>1</sup></td>
-                  <td>46.71<sup>1</sup></td>
-                </tr>
-              </tbody>
-            </table>
-            <table class="appendix-table">
-              <thead>
-                <tr>
-                  <td>Source</td>
-                  <td>Capital ($ / kW)</td>
-                  <td>Fixed ($ / kW-year)</td>
-                  <td>Variable Costs ($ / MWh)</td>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>Nuclear Optimistic Future</td>
-                  <td>2000<sup>3</sup></td>
-                  <td>60<sup>3</sup></td>
-                  <td>12<sup>3</sup></td>
-                </tr>
-                <tr>
-                  <td>Nuclear Moderate Future</td>
-                  <td>3500<sup>3</sup></td>
-                  <td>80<sup>3</sup></td>
-                  <td>12<sup>3</sup></td>
-                </tr>
-                <tr>
-                  <td>Nuclear Today</td>
-                  <td>5880<sup>1</sup></td>
-                  <td>99.65<sup>1</sup></td>
-                  <td>10<sup>1,5</sup></td>
-                </tr>
-              </tbody>
-            </table>
-            <p>
-              We treat hydropower as a legacy resource, assuming that all economic sites for building dams have already been exploited. This caps the total amount of hydropower available to be the existing capacity in each region in the United States.
-            </p>
-            <table class="appendix-table">
-              <thead>
-                <tr>
-                  <td>Source</td>
-                  <td>Capital ($ / kW)</td>
-                  <td>Fixed ($ / kW-year)</td>
-                  <td>Variable Costs ($ / MWh)</td>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>Hydropower</td>
-                  <td>0 (already built)</td>
-                  <td>14.93<sup>1</sup></td>
-                  <td>2.66<sup>1</sup></td>
-                </tr>
-              </tbody>
-            </table>
+        <h2>Acknowledgements</h2>
 
-            <h3>Fossil fuel</h3>
-            <p>
-              Fossil fuel technology is mature, with efficiency slowly improving.  The biggest factor that affects natural-gas-based electricity is the cost of the natural gas itself. With the widespread use of hydraulic fracturing in the United States, natural gas prices have reached historic lows. For natural gas, we set “low cost” to be the price paid by utilities for natural gas in the second quarter of 2016. However, natural gas prices are volatile in both time and across different countries. To represent this volatility, we set “medium cost” to be a typical European fuel price (January 2016) and “high cost” be $13.5/MMBTU (higher than the highest monthly price in the United States since 2002, but lower than the peak Japanese cost for LNG).  We set capital costs to today’s technology to be the same across all three fuel costs.
-            </p>
-            <p>
-              For natural gas, we consider two types of plant Natural Gas Combined Cycle (NGCC) and Natural Gas Conventional Turbine (NGCT)
-            </p>
-            <p>
-              For coal, we see very little price changes over time and have fixed coal costs at a single value.
-            </p>
-            <table class="appendix-table">
-              <thead>
-                <tr>
-                  <td>Source</td>
-                  <td>Capital ($ / kW)</td>
-                  <td>Fixed ($ / kW-year)</td>
-                  <td>Fuel ($ / MMBTU)</td>
-                  <td>Heat rate (BTU / kWh)</td>
-                  <td>CO<sub>2</sub> (kg / MMBTU)</td>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>NGCT $</td>
-                  <td>672<sup>1</sup></td>
-                  <td>6.76<sup>1</sup></td>
-                  <td>2.51<sup>6</sup></td>
-                  <td>8550<sup>1</sup></td>
-                  <td>53<sup>7</sup></td>
-                </tr>
-                <tr>
-                  <td>NGCT $$</td>
-                  <td>672<sup>1</sup></td>
-                  <td>6.76<sup>1</sup></td>
-                  <td>2.51<sup>6</sup></td>
-                  <td>8550<sup>1</sup></td>
-                  <td>53<sup>7</sup></td>
-                </tr>
-                <tr>
-                  <td>NGCT $$</td>
-                  <td>672<sup>1</sup></td>
-                  <td>6.76<sup>1</sup></td>
-                  <td>2.51<sup>6</sup></td>
-                  <td>8550<sup>1</sup></td>
-                  <td>53<sup>7</sup></td>
-                </tr>
-                <tr>
-                  <td>NGCC $</td>
-                  <td>1094<sup>1</sup></td>
-                  <td>9.94<sup>1</sup></td>
-                  <td>2.51<sup>6</sup></td>
-                  <td>6200<sup>1</sup></td>
-                  <td>53<sup>7</sup></td>
-                </tr>
-                <tr>
-                  <td>NGCC $$</td>
-                  <td>1094<sup>1</sup></td>
-                  <td>9.94<sup>1</sup></td>
-                  <td>2.51<sup>6</sup></td>
-                  <td>6200<sup>1</sup></td>
-                  <td>53<sup>7</sup></td>
-                </tr>
-                <tr>
-                  <td>NGCC $$</td>
-                  <td>1094<sup>1</sup></td>
-                  <td>9.94<sup>1</sup></td>
-                  <td>2.51<sup>6</sup></td>
-                  <td>6200<sup>1</sup></td>
-                  <td>53<sup>7</sup></td>
-                </tr>
-                <tr>
-                  <td>Coal</td>
-                  <td>2934<sup>2</sup></td>
-                  <td>31.18<sup>2</sup></td>
-                  <td>2.14<sup>2</sup></td>
-                  <td>8800<sup>2</sup></td>
-                  <td>98<sup>7</sup></td>
-                </tr>
-              </tbody>
-            </table>
-            -->
+        <p>Grid Transition is by Thatcher Ulrich, based heavily on
+          the wonderful
+          <a href="https://google.github.io/energystrategies/">Energy
+            Strategies</a> tool released in 2016.
+        </p>
 
-            <h3>Carbon capture and sequestration (CCS)</h3>
-            <p>
-              I'm a bit skeptical of CCS so I didn't include it
-              explicitly in the tool.  However, you are encouraged to
-              adjust the assumptions for Natural Gas and Coal to
-              explore the effects of CCS.
-            </p>
-
-            <h2>Transmission</h2>
-            <p>
-              For simplicity I omitted transmittion and location from
-              the model. This makes the grid balancing easier because
-              it's assumed that generation is always close to use. But
-              it makes grid balancing harder because there is no
-              provision for import/export of electricity to
-              neighboring grids. ISO-NE actually imports a significant
-              percentage of electrity from Ontario, New Brunswick, and
-              New York, but that complicates the modeling and makes it
-              less useful as a proxy for other grids. The intention is
-              to make it slightly harder to decarbonize the model than
-              to decarbonize a real grid with ability to
-              import/export.
-            </p>
-
-            <h2>Data</h2>
-            <p>
-              I grabbed the ISO-NE demand profile, and solar & wind
-              supply profiles
-              from <a href="https://github.com/google/energysimulation/tree/master/gridsim/data/profiles">energysimulation</a>.
-              This is based on observed hourly values from 2015.
-              [TODO more]
-            </p>
-
-            <h2>Hydropower</h2>
-            <p>
-              I modeled hydropower as a constant flat source. This is
-              not realistic -- depending on the facility, hydro can
-              have a lot of dispatchability and storage features, and
-              at other times can be constrained by weather and
-              environmental requirements. But, those inaccuracies are
-              in different directions so hopefully they balance out to
-              some degree.
-            </p>
-
-            <h2>Sources</h2>
-            [TODO links]
-            <!--
-            <ol>
-              <li>
-                U.S. Energy Information Administration,
-                <a href="https://www.eia.gov/outlooks/aeo/assumptions/pdf/table_8.2.pdf">
-                  Cost and Performance Characteristics of New Generating Technologies, Annual Energy Outlook 2017
-                </a>, (2017).
-              </li>
-              <li>
-                U.S. Energy Information Administration.
-                <a href="https://www.eia.gov/outlooks/capitalcost/pdf/updated_capcost.pdf">
-                  Updated capital cost estimates for utility scale electricity generating plants
-                </a>, (2013).
-              </li>
-              <li>
-                IRENA,
-                <a href="http://www.irena.org/DocumentDownloads/Publications/IRENA_Power_to_Change_2016.pdf">
-                  The power to change: Solar and wind cost reduction potential to 2025
-                </a>, (2016).
-              </li>
-              <li>
-                Clean Air Task Force,
-                <a href="http://www.catf.us/resources/publications/files/Advanced_Nuclear_Energy.pdf">
-                  Advanced nuclear energy: Need, characteristics, projected costs, and opportunities
-                </a> (2016).
-              </li>
-              <li>
-                U.S. Energy Information Administration,
-                <a href="http://www.eia.gov/electricity/annual/html/epa_08_04.html">
-                  Average Power Plant Operating Expenses for Major U.S. Investor-Owned Electric Utilities
-                </a>, (2014).
-              </li>
-              <li>
-                U.S. Energy Information Administration,
-                <a href="https://www.eia.gov/forecasts/steo/tables/pdf/2tab.pdf">
-                  Short-Term Energy Outlook, Table 2. Energy Prices
-                </a> (2017).
-              </li>
-              <li>
-                World Bank,
-                <a href="http://pubdocs.worldbank.org/en/561011486076393416/CMO-Historical-Data-Monthly.xlsx">
-                  Commodity Price Data (The Pink Sheet)
-                </a>, (2017).
-              </li>
-              <li>
-                T. Grant, D. Morgan, and K. Gerdes.
-                <a href="https://www.netl.doe.gov/File%20Library/Research/Energy%20Analysis/Publications/QGESS_CO2T-S_Rev3_20140514.pdf">
-                  Carbon dioxide transport and storage costs in NETL studies.
-                </a> Technical Report DOE/NETL-2013/1614, National Energy Technology Laboratory, (2014).
-              </li>
-              <li>
-                Mark J. Jensen, Christopher S. Russell, David Bergeson, Christopher D. Hoeger, David J. Frankman, Christopher S. Bence, and Larry L. Baxter.
-                <a href="https://www.researchgate.net/publication/282742068_Prediction_and_validation_of_external_cooling_loop_cryogenic_carbon_capture_CCC-ECL_for_full-scale_coal-fired_power_plant_retrofit">
-                  Prediction and validation of external cooling loop cryogenic carbon capture (CCC-ECL) for full-scale coal-fired power plant retrofit.
-                </a> International Journal of Greenhouse Gas Control, 42:200–212, (2015).
-              </li>
-              <li>
-                IRENA.
-                <a href="http://www.irena.org/DocumentDownloads/Publications/IRENA_REthinking_Energy_2017.pdf">
-                  REthinking energy 2017: Accelerating the global energy transformation
-                </a> (2017).
-              </li>
-              <li>
-                W.G. Manuel.
-                <a href="http://www.energy.ca.gov/assessments/ab2514_reports/Turlock_Irrigation_District/2014-10-28_Turlock_Irrigation_District_Energy_Storage_Study.pdf">
-                  Energy storage study
-                </a>, Turlock Irrigation District, (2014).
-              </li>
-              <li>
-                Ryan Pletka, Jagmeet Khangura, Andy Rawlins, Elizabeth Waldren, and Dan Wilson.
-                <a href="https://www.wecc.biz/Reliability/2014_TEPPC_Transmission_CapCost_Report_B+V.pdf">
-                  Capital costs for transmission and substations
-                </a>. Western Electricity Coordinating Council, (2014).
-              </li>
-              <li>
-                U.S. Energy Information Administration.
-                <a href="https://www.eia.gov/electricity/data/eia860/">
-                  Form EIA-860 detailed data
-                </a>, (2016).
-              </li>
-              <li>
-                Wikipedia,
-                <a href="https://en.wikipedia.org/wiki/2014%E2%80%9316_El_Ni%C3%B1o_event?section=6#North_America">
-                  2014–16 El Niño event
-                </a>, (2017).
-              </li>
-              <li>
-                Williams, J.H.,	B. Haley, F. Kahrl, J. Moore, A.D. Jones, M.S. Torn,	H. McJeon,
-                <a href="http://unsdsn.org/wp-content/uploads/2014/09/US-Deep-Decarbonization-Report.pdf">Pathways to deep decarbonization in the United States</a>
-                . The U.S. report of the Deep	Decarbonization Pathways  Project of the Sustainable Development Solutions Network and the Institute for Sustainable Development and International Relations.  (2014).
-              </li>
-            </ol>
-            -->
-          <!-- </div> --> <!-- mdl-cell--8-col -->
-        <!-- </div> --> <!-- mdl-grid -->
+        <p>
+          Energy Strategies: concept, design and development by
+          Amber Robson, Corrie Scalisi, Doug Fritz, Drew Bryant,
+          John Platt, Jonny Mack, Josh Freed, Kate Brandt, Matt
+          Jones, Michael Terrell, Orion Pritchard, Philippe
+          Larochelle, Ross Koningstein, Ryan Fitzpatrick and
+          Saleem Van Groenou.
+        </p>
 
         <h2>Code</h2>
-	See <a href="https://github.com/tulrich/gridx2020">https://github.com/tulrich/gridx2020</a>
-      </div>
+        <p>
+	  See <a href="https://github.com/tulrich/gridx2020">https://github.com/tulrich/gridx2020</a>
+	</p>
+      </div>  <!-- About -->
     </div> <!-- tabs -->
   </main> <!-- main content -->
 </div> <!-- container -->

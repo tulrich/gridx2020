@@ -298,10 +298,10 @@ export const DEFAULT_PARAMETERS: ScenarioParameters = {
     solar: {
       initialFraction: 0.02,
       ramp: [{
-          buildFraction: 0.20,
+          buildFraction: 0.15,
           atYear: 2030,
         }, {
-          buildFraction: 0.40,
+          buildFraction: 0.35,
           atYear: 2040,
         }],
       buildTime: 1,
@@ -325,10 +325,10 @@ export const DEFAULT_PARAMETERS: ScenarioParameters = {
       buildTime: 1,
       buildCost: 1.3,
       ramp: [{
-          buildFraction: 0.20,
+          buildFraction: 0.15,
           atYear: 2030,
         }, {
-          buildFraction: 0.50,
+          buildFraction: 0.45,
           atYear: 2040,
         }],
       operatingCost: 32,
@@ -405,7 +405,7 @@ export const DEFAULT_PARAMETERS: ScenarioParameters = {
           buildFraction: 1.85,
           atYear: 2030,
         }, {
-          buildFraction: 2.45,
+          buildFraction: 2.65,
           atYear: 2040,
         }],
       operatingCost: 13.125,

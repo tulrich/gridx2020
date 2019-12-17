@@ -35,23 +35,19 @@ limitations under the License.
       <span class="mdl-layout__title">Grid Transition</span>&nbsp(Beta)
       <div class="mdl-layout-spacer"></div>
       <nav class="mdl-navigation">
-        <a class="mdl-navigation__link" href="" id="title-model">Model</a>
-        <a class="mdl-navigation__link" href="" id="title-about-appendix">About</a>
+        <a class="mdl-navigation__link model-link" href="">Model</a>
+        <a class="mdl-navigation__link about-link" href="">About</a>
       </nav>
     </div>
   </header>
 
-  <!--
   <div class="mdl-layout__drawer">
-    <span class="mdl-layout__title">Grid Transition</span>
+    <span class="mdl-layout__title">Grid Transition&nbsp(Beta)</span>
     <nav class="mdl-navigation">
-      <a class="mdl-navigation__link" href="">Model</a>
-      <a class="mdl-navigation__link" href="">About</a>
-      <a class="mdl-navigation__link" href="">Details</a>
-      <a class="mdl-navigation__link" href="">Code</a>
+      <a class="mdl-navigation__link model-link" href="">Model</a>
+      <a class="mdl-navigation__link about-link" href="">About</a>
     </nav>
   </div>
-  -->
 
   <!-- Main page content region -->
   <main id="scroll-container" class="mdl-layout__content">
@@ -523,6 +519,11 @@ limitations under the License.
           <div class="mdl-grid utility-presets-container">
             <div class="preset-container">
               <span class="preset-label">Presets</span>
+              <i id="tooltip-launcher-utility-presets" class="material-icons info">info_outline</i>
+              <span class="tooltip mdl-tooltip mdl-tooltip--right"
+                    for="tooltip-launcher-utility-presets">
+                The buttons below select different preset scenarios.
+              </span><br/>
               <label class="preset mdl-icon-toggle mdl-js-icon-toggle" for="preset-util-default">
                 <input type="checkbox" id="preset-util-default" class="mdl-icon-toggle__input">
                 <span class="mdl-icon-toggle__label">Default</span>
@@ -547,11 +548,6 @@ limitations under the License.
                 <input type="checkbox" id="preset-util-flat" class="mdl-icon-toggle__input">
                 <span class="mdl-icon-toggle__label">Flat</span>
               </label>
-              <i id="tooltip-launcher-utility-presets" class="material-icons info">info_outline</i>
-              <span class="tooltip mdl-tooltip mdl-tooltip--right"
-                    for="tooltip-launcher-utility-presets">
-                The buttons to the left select different preset scenarios.
-              </span>
             </div>
           </div>
         </div>

@@ -238,10 +238,11 @@ label {
 .preset {
   border-radius: 24px;
   border: 1px solid rgb(78, 146, 223);
+  font-size: 14px;
   height: 32px;
   line-height: 32px;
-  margin: 4px;
-  padding: 0 10px;
+  margin: 3px;
+  padding: 0 5px;
   text-transform: none;
 }
 
@@ -260,12 +261,14 @@ label {
 
 .preset-label {
   font-size: 18px;
-  padding-right: 16px;
+  padding-top: 12px;
+  padding-right: 8px;
   color: rgba(0,0,0,.87);
 }
 
 .preset-container {
-  margin-left: 10px;
+  margin-top: 5px;
+  margin-left: 12px;
   margin-right: 1px;
 }
 

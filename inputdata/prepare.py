@@ -109,25 +109,42 @@ def MergeSeries(demand, solar, wind):
 def EstimateCapacity(t, maxes):
     # Look at the maximum six months ahead; should be a
     # good/conservative proxy for installed capacity.
-    plus_t = min(t + 4380, len(maxes) - 1)
+    #plus_t = min(t + 4380, len(maxes) - 1)
+    plus_t = min(t + 30 * 24, len(maxes) - 1)  #xxxx 1 month ahead?
     return maxes[plus_t]
 
 
-def NormalizeGenerationProfile(profile):
+def NormalizeGenerationProfile(profile, annual_capacity_factor):
     '''Modify profile in place.
     '''
 
-    # Divide out capacity growth so peak capacity is at 1000
+    values = [float(elem[1]) for elem in profile[1:]]
 
-    values = [el[1] for el in profile[1:]]
+    # Divide out capacity growth so peak capacity is at 1000
     maxes = numpy.maximum.accumulate(values)
 
     out = numpy.zeros(len(values), dtype=int)
     for i in range(len(values)):
         capest = EstimateCapacity(i, maxes)
         profile[i + 1][1] = int(round(values[i] * 1000.0 / capest))
-        if i % 1000:
-            print(i)
+        values[i] = profile[i + 1][1]
+
+    # Normalize CF by year
+    cumsum = numpy.cumsum(values)
+    annual_avg = []
+    for i in range(0, len(values)):
+        i1 = min(i + 8760, len(values) - 1)
+        if i1 > i + 4380:
+            annual_avg.append((cumsum[i1] - cumsum[i]) / (i1 - i))
+            cf_adjust = annual_capacity_factor / (annual_avg[-1] / 1000.0)
+            values[i] = min(1000, int(round(values[i] * cf_adjust)))
+            profile[i + 1][1] = values[i]
+        
+    # Print capacity factors per year
+    print("==")
+    for i in range(0, len(values), 8760):
+        cf = numpy.sum(values[i: i + 8760]) / (8760 * 1000)
+        print("CF[" + str(i) + "]: " + str(cf))
 
 
 def NormalizeDemandProfile(profile):
@@ -155,7 +172,7 @@ def NormalizeDemandProfile(profile):
             else:
                 f = (i - i0 - 4380) / 4380
                 scale = (1 - f) * scale1 + f * scale2
-            profile[i + 1][1] = values[i] * scale
+            profile[i + 1][1] = int(round(values[i] * scale))
 
 
 demand = [['datehour' , 'demand (MWh)']]
@@ -174,7 +191,7 @@ with open(SOLAR_FILE) as csvfile:
     #row = next(r)
     for row in r:
         solar.append([NormalizeDateHour(row[1], IntQuantity(row[2])), FloatQuantity(row[3])])
-NormalizeGenerationProfile(solar)
+NormalizeGenerationProfile(solar, 0.145)
 
 wind = [['datehour', 'wind (capacity = 1000)']]
 with open(WIND_FILE) as csvfile:
@@ -184,7 +201,7 @@ with open(WIND_FILE) as csvfile:
     #row = next(r)
     for row in r:
         wind.append([NormalizeDateHour(row[1], IntQuantity(row[2])), FloatQuantity(row[3])])
-NormalizeGenerationProfile(wind)
+NormalizeGenerationProfile(wind, 0.35)
 
 series = MergeSeries(demand, solar, wind)
 

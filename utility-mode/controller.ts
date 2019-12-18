@@ -491,7 +491,7 @@ export class UtilityController implements SliderNotifee {
                                           100,
                                           (tick: number) => { return tick / 100; },
                                           (value: number) => { return value * 100; },
-                                          '|.0|%', this, true));
+                                          '|.0%|', this, true));
       if (this._parameters.source[source].isStorage) {
         addAssumptionSlider(new SliderBinder(`${source}-storage-round-trip-efficiency-slider`,
                                             this._parameters.source[source], 'storageRoundTripEfficiency',

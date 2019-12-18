@@ -488,7 +488,7 @@ export function simulateGrid(
         let co2 = mwh * 1e3 * p.co2Intensity / 1e6;  // intensity in grams/kWh, output metric tons CO2
         // Carbon price.
         cost += co2 * params.carbonPrice;
-        
+
         discountedCost[source] = cost * discountScale;
         sumDiscountedCost += discountedCost[source];
 

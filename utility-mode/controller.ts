@@ -196,20 +196,32 @@ export class UtilityController implements SliderNotifee {
     //xxx d3.json(this.dataUrl, this._handleDataLoaded.bind(this));
 
     d3.csv(this.transitionDatasetUrl, this._handleDataLoaded.bind(this));
-  };
+
+    let csv_link = document.getElementsByClassName('download-csv-link')[0];
+    csv_link['onclick'] = (event: Event) => {
+      let data = this._buildCsv(this._dataView); // "some,data,for,test\n0,1,2,3\n";
+      let blob = new Blob([data], {type: "text/csv"}); // {type: "octet/stream"});
+      let url = window.URL.createObjectURL(blob);
+      csv_link['href'] = url;
+      csv_link['target'] = '_blank';
+      csv_link['download'] = 'gridx2020_dump.csv';  // add some hash or something to the name?
+    };
+  }
 
   /**
    * Constructs a utility mode data view from the given elements.
    *
-   * @param allocations Energy source allocations.
-   * @param profiles Energy source profiles.
-   * @param outcome Scenario outcome for the given allocations and profiles.
+   * @param params Model input parameters.
+   * @param allocatedProfiles Full-res hourly profiles from model.
+   * @param condensedProfiles Energy source profiles, condensed for display.
+   * @param highlightProfiles Profile focused on a region of interest.
    * @returns A utility data view that packages together the current state.
    */
-  _asUtilityDataView(params, profiles, highlightProfiles, outcome): UtilityDataView {
+  _asUtilityDataView(params, allocatedProfiles, condensedProfiles, highlightProfiles, outcome): UtilityDataView {
     return {
       params: params,
-      profiles: profiles,
+      rawProfiles: allocatedProfiles,
+      profiles: condensedProfiles,
       highlightProfiles: highlightProfiles,
       summary: outcome,
       population: 0, // config.POPULATION,
@@ -253,7 +265,7 @@ export class UtilityController implements SliderNotifee {
     const [condensedProfiles, highlightProfiles] = profiles.condenseByPeriod(allocatedProfiles, this._parameters);
     const summary = profiles.summarize(this._parameters, condensedProfiles);
     const newView = this._asUtilityDataView(
-      this._parameters, condensedProfiles, highlightProfiles, summary);
+					    this._parameters, allocatedProfiles, condensedProfiles, highlightProfiles, summary);
     const perMWhBreakdown: any = {};
     config.ALL_ENERGY_SOURCES.forEach(source => {
       const cost = newView.summary.breakdown[source].cost;
@@ -300,17 +312,13 @@ export class UtilityController implements SliderNotifee {
     this._parameters = {} as any;
     util.mergeDeep(config.DEFAULT_PARAMETERS, this._parameters);
 
-//     const allocatedProfiles = profiles.getAllocatedEnergyProfiles(
-//       allocations,
-//       this.profileDataset);
     const allocatedProfiles = profiles.simulateGrid(this._parameters, this.profileDataset);
     const [condensedProfiles, highlightProfiles] = profiles.condenseByPeriod(allocatedProfiles, this._parameters);
     const updatedSummary = profiles.summarize(this._parameters, condensedProfiles);
     const utilityDataView = this._asUtilityDataView(
-        this._parameters, condensedProfiles, highlightProfiles, updatedSummary);
+						    this._parameters, allocatedProfiles, condensedProfiles, highlightProfiles, updatedSummary);
 
     // Create each of the output components.
-    //const kChartWidth = 330;
     const kChartWidth = 350;
 
     this._profilesChart = new SupplyDemandProfilesChart(
@@ -338,7 +346,7 @@ export class UtilityController implements SliderNotifee {
 	 {
            size: { width: kChartWidth, height: 200 },
 	   useCo2Profiles: true,
-	   profileLines: ['spend', 'co2'],
+	   profileLines: ['co2'],
 	   labels: { yAxis: 'CO2 (Mt/y)' },
 	 });
     this._components.push(this._co2ProfilesChart);
@@ -544,20 +552,86 @@ export class UtilityController implements SliderNotifee {
       //...
     }
 
-//     let sliderTabs = new (window as any).MaterialTabs(document.getElementById('slider-tabs'));
-//     (window as any).sliderTabs = sliderTabs;//xxxx
-
-//     let tabs = [];
-//     tabs.push(new (window as any).MaterialTab(document.getElementById('solar-tab'), sliderTabs));
-//     tabs.push(new (window as any).MaterialTab(document.getElementById('wind-tab'), sliderTabs));
-//     tabs.push(new (window as any).MaterialTab(document.getElementById('hydro-tab'), sliderTabs));
-//     tabs.push(new (window as any).MaterialTab(document.getElementById('nuclear-tab'), sliderTabs));
-//     tabs.push(new (window as any).MaterialTab(document.getElementById('ng-tab'), sliderTabs));
-//     tabs.push(new (window as any).MaterialTab(document.getElementById('coal-tab'), sliderTabs));
-//     tabs.push(new (window as any).MaterialTab(document.getElementById('battery-tab'), sliderTabs));
-//     tabs.push(new (window as any).MaterialTab(document.getElementById('h2-tab'), sliderTabs));
-
     this.sliderChanged(undefined);
+  }
+
+  _buildCsv(view: UtilityDataView) {
+    let csv = '';
+
+    // Results summary.
+    csv += 'LCOE $/MWh,CO2 g/KWh,unmet demand hours\n';
+    csv +=
+      d3.format('.2f')(view.profiles.sumDiscountedCost / view.profiles.sumDiscountedMwh) + ',' +
+      d3.format('.0f')(view.profiles.sumCo2 * 1e3 / view.profiles.sumMwh) + ',' +
+      view.rawProfiles.series['unmet'].filter(value => value > 0).length + '\n';
+    csv += '\n';
+
+    // Parameters.
+    let paramsKeys = getKeys(view.params, ['source', 'firstYear', 'lastYear']);
+    csv += csvHeaderLine(paramsKeys);
+    csv += csvValueLine(paramsKeys, view.params);
+    csv += '\n';
+    let sourceRowKeys = getKeys(view.params.source, []);
+    let sourceParams = ['source', 'build0Fraction', 'build0Year', 'build1Fraction', 'build1Year']
+      .concat(getKeys(view.params.source['solar'], ['ramp']));
+    csv += csvHeaderLine(sourceParams);
+    for (let sourceKey of sourceRowKeys) {
+      let sourceParams = view.params.source[sourceKey];
+      let vals = [sourceKey,
+                  sourceParams.ramp[0].buildFraction,
+                  sourceParams.ramp[0].atYear,
+                  sourceParams.ramp[1].buildFraction,
+                  sourceParams.ramp[1].atYear,
+                  ];
+      for (let k in sourceParams) {
+        if (k != 'ramp') {
+          vals.push(sourceParams[k]);
+        }
+      }
+      csv += csvLine(vals);
+    }
+    csv += '\n';
+
+    // Annual spending.
+    csv += 'year';
+    sourceRowKeys.forEach(source => { csv += ',' + source + ' $'; });
+    csv += '\n';
+    for (let year in view.profiles.capacitySpend['solar']) {
+      csv += (2020 + Number(year));
+      sourceRowKeys.forEach(source => {
+          let spend = (view.profiles.capacitySpend[source][year] + view.profiles.capacitySpend[source][year]);
+          csv += ',' + d3.format('.0f')(spend);
+        });
+      csv += '\n';
+    }
+    csv += '\n';
+
+    // Annual CO2.
+    csv += 'year';
+    sourceRowKeys.forEach(source => { csv += ',' + source + ' tCO2'; });
+    csv += '\n';
+    for (let year in view.profiles.sourceCo2['solar']) {
+      csv += (2020 + Number(year));
+      sourceRowKeys.forEach(source => {
+          let co2 = view.profiles.sourceCo2[source][year];
+          csv += ',' + d3.format('.0f')(co2);
+        });
+      csv += '\n';
+    }
+    csv += '\n';
+
+    // Full profiles.
+    let profileKeys = getKeys(view.rawProfiles.series, []);
+    csv += 'index,' + csvHeaderLine(profileKeys);
+    for (let i = 0; i < view.rawProfiles.series.demand.length && i < 100; i++) {
+      csv += i;
+      profileKeys.forEach(key => {
+	  csv += ',' + d3.format('.0f')(view.rawProfiles.series[key][i]);
+	});
+      csv += '\n';
+    }
+
+    return csv;
   }
 
   _show(view: UtilityDataView) {
@@ -709,4 +783,50 @@ function createUtilityPresets(callback: (stateString: string) => void): PresetOp
 
   return new PresetOptionGroup<config.UtilityPresetOption>(
       presetElementConfig, utilityPresetCallback);
+}
+
+function getKeys(value: Object, excludeKeys: string[]) {
+  let out = [];
+  for (let key in value) {
+    if (excludeKeys.indexOf(key) == -1) {
+      out.push(key);
+    }
+  }
+  return out;
+}
+
+function csvHeaderLine(keys: string[]) {
+  let csv = '';
+  for (let i = 0; i < keys.length; i++) {
+    if (csv.length) {
+      csv += ',';
+    }
+    csv += keys[i];
+  }
+  csv += '\n'
+  return csv;
+};
+
+function csvValueLine(keys: string[], value: Object) {
+  let csv = '';
+  for (let key of keys) {
+    if (csv.length) {
+      csv += ',';
+    }
+    csv += value[key];
+  }
+  csv += '\n';
+  return csv;
+}
+
+function csvLine(vals: Object[]) {
+  let csv = '';
+  for (let val of vals) {
+    if (csv.length) {
+      csv += ',';
+    }
+    csv += val;
+  }
+  csv += '\n';
+  return csv;
 }

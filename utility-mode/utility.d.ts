@@ -16,7 +16,7 @@ limitations under the License.
 
 // Type definition specific to utility mode.
 type UtilityEnergySource = /* 'coalccs' | 'ngccs' | */ EnergySource;
-type ProfileSeries = 'supply' | 'demand' | 'unmet' | 'co2' | 'spend' | UtilityEnergySource;  // TODO 'stored'
+type ProfileSeries = 'supply' | 'demand' | 'unmet' | 'co2' | 'toStorage' | 'excess' | UtilityEnergySource;  // TODO 'stored'
 type StorageEnergySource = 'battery' | 'h2';
 
 // Object literal types keyed by a fixed set of values.
@@ -49,6 +49,11 @@ interface ProfileDataset {
   // i.e., for all i, series.foo[i] <=> series.bar[i] <=> index[i].
   series: ProfileSeriesMap<number[]>;
 
+  capacitySpend?: ProfileSeriesMap<number[]>;  // In $
+  operationSpend?: ProfileSeriesMap<number[]>;  // In $
+  sourceSupply?: ProfileSeriesMap<number[]>;  // In MWh. Raw output, not including curtailment.
+  sourceCo2?: ProfileSeriesMap<number[]>;  // In metric tons CO2
+
   sumCo2?: number;
   sumMwh?: number;
   sumDiscountedCost?: number;
@@ -65,11 +70,11 @@ interface Ramp {
  * Parameters for modeling an energy source during the transition.
  */
 interface SourceParameters {
-  // year 1 avg output / year 1 avg demand
-  initialFraction: number;
-
   // Desired changes to capacity.
   ramp: Ramp[];
+
+  // year 1 avg output / year 1 avg demand
+  initialFraction: number;
 
   // Years to construct a plant.
   buildTime: number;
@@ -131,7 +136,10 @@ type ProfileAllocations = UtilityEnergySourceMap<number>;
  * Utility mode data and configuration view.
  */
 interface UtilityDataView extends SummaryDataView<UtilityEnergySource> {
-  // The allocated time profile for each available energy source.
+  // Raw model output.
+  rawProfiles: ProfileDataset;
+
+  // The condensed allocated time profile for each available energy source.
   profiles: ProfileDataset;
 
   // A highlight profile, subsetting a region of interest.

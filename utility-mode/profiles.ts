@@ -302,16 +302,20 @@ export function simulateGrid(
   // Build desired capacity according to the plans.
   let yearCount = params.lastYear - params.firstYear;
   let sourceScale: ProfileSeriesMap<number[]> = {} as any;  // array indexed by (year - year0)
-  let sourceSpend: ProfileSeriesMap<number[]> = {} as any;  // array indexed by (year - year0)
-  let discountedCost: ProfileSeriesMap<number> = {} as any;
+  let capacitySpend: ProfileSeriesMap<number[]> = {} as any;  // array indexed by (year - year0)
+  let operationSpend: ProfileSeriesMap<number[]> = {} as any;  // array indexed by (year - year0)
+  let sourceCo2: ProfileSeriesMap<number[]> = {} as any;  // array indexed by (year - year0)
+  let sourceSupply: ProfileSeriesMap<number[]> = {} as any;  // array indexed by (year - year0)
   config.ALL_ENERGY_SOURCES.forEach(source => {
       let p = params.source[source];
       let learningFactor = 1;
       let learningBase = p.initialFraction + p.costLearningBase;
       let cumulativeBuilt = learningBase;
       sourceScale[source] = [];
-      sourceSpend[source] = [];
-      discountedCost[source] = 0;
+      capacitySpend[source] = [];
+      operationSpend[source] = [];
+      sourceCo2[source] = [];
+      sourceSupply[source] = [];
       let desiredFraction = [];
       for (let y = 0; y < yearCount; y++) {
         desiredFraction[y] = computeRampValue(params.source[source], params.firstYear, y + params.firstYear);
@@ -331,7 +335,10 @@ export function simulateGrid(
         } else {
           sourceScale[source][y] = 0;
         }
-        sourceSpend[source][y] = 0;
+        capacitySpend[source][y] = 0;
+	operationSpend[source][y] = 0;
+	sourceSupply[source][y] = 0;
+	sourceCo2[source][y] = 0;
       }
 
       // Try to build the desired capacity.
@@ -351,7 +358,7 @@ export function simulateGrid(
           let spentPerYear = spent / params.source[source].buildTime;
           // Allocate the spending across the build years.
           for (let yy = y - params.source[source].buildTime; yy < y; yy++) {
-            sourceSpend[source][yy] += spentPerYear;
+            capacitySpend[source][yy] += spentPerYear;
           }
         }
         // Built capacity lives for the plant lifetime.
@@ -379,6 +386,7 @@ export function simulateGrid(
   };
   const supplyProfile = (new Array(scaledDemand.length))['fill'](0.);
   const acceptedForStorageProfile = (new Array(scaledDemand.length))['fill'](0.);
+  const excessProfile = (new Array(scaledDemand.length))['fill'](0.);
   let storageState = {
       battery: 0.,
       h2: 0.,
@@ -465,32 +473,38 @@ export function simulateGrid(
       }
       if (scaledDemand[i] <= supplyProfile[i] - acceptedForStorageProfile[i]) {
 	mwhThisYear += scaledDemand[i];
+	excessProfile[i] = Math.floor((supplyProfile[i] - acceptedForStorageProfile[i] - scaledDemand[i]) * 4) / 4;
       } else {
 	mwhThisYear += supplyProfile[i] - acceptedForStorageProfile[i];
+	excessProfile[i] = 0;
       }
     }
 
     // Update costs.
     config.ALL_ENERGY_SOURCES.forEach(source => {
         let p = params.source[source];
-        let cost = 0;
-        // Build cost this year.
-        cost += sourceSpend[source][year];
+
+        let operationCost = 0;
         // Fuel cost this year.
         let profile = p.isDispatchable ? dispatchProfile[source] : normalizedProfiles[source];
         let mwh = d3.sum(profile.slice(j, j1));
-        cost += mwh * p.fuelCost;
+	sourceSupply[source][year] = mwh;
+        operationCost += mwh * p.fuelCost;
         // Capacity opex this year.
         let capacityMw = sourceScale[source][year] * yearOneSourceCapacity[source];
-        // operatingCost is in $/KW_capacity/year
-        cost += capacityMw * 1e3 * p.operatingCost;
+        // p.operatingCost is in $/KW_capacity/year
+        operationCost += capacityMw * 1e3 * p.operatingCost;
         // Co2 emissions.
         let co2 = mwh * 1e3 * p.co2Intensity / 1e6;  // intensity in grams/kWh, output metric tons CO2
+	sourceCo2[source][year] = co2;
         // Carbon price.
-        cost += co2 * params.carbonPrice;
+        operationCost += co2 * params.carbonPrice;
 
-        discountedCost[source] = cost * discountScale;
-        sumDiscountedCost += discountedCost[source];
+	operationSpend[source][year] = operationCost;
+
+        // Build cost this year.
+        let cost = operationCost + capacitySpend[source][year];
+        sumDiscountedCost += cost * discountScale;
 
         sumCo2 += co2;
       });
@@ -521,6 +535,12 @@ export function simulateGrid(
       // Profile of unmet demand.
       unmet: unmetProfile,
 
+      // Energy sent to storage (input, before losses).
+      toStorage: acceptedForStorageProfile,
+
+      // Energy produced but not consumed or sent to storage.
+      excess: excessProfile,
+
       // Profile of total energy generation.
       supply: supplyProfile,
 
@@ -537,8 +557,11 @@ export function simulateGrid(
       battery: dispatchProfile.battery,
       h2: dispatchProfile.h2,
       co2: zeroSeries,
-      spend: zeroSeries,
     },
+    capacitySpend: capacitySpend,
+    operationSpend: operationSpend,
+    sourceSupply: sourceSupply,
+    sourceCo2: sourceCo2,
     sumCo2: sumCo2,
     sumMwh: sumMwh,
     sumDiscountedCost: sumDiscountedCost,
@@ -616,6 +639,10 @@ export function condenseByPeriod(profiles: ProfileDataset, params: ScenarioParam
     index: [],
     units: profiles.units,
     series: {} as any,
+    capacitySpend: profiles.capacitySpend,
+    operationSpend: profiles.operationSpend,
+    sourceSupply: profiles.sourceSupply,
+    sourceCo2: profiles.sourceCo2,
     sumDiscountedCost: profiles.sumDiscountedCost,
     sumDiscountedMwh: profiles.sumDiscountedMwh,
     sumCo2: profiles.sumCo2,
@@ -669,10 +696,10 @@ export function condenseByPeriod(profiles: ProfileDataset, params: ScenarioParam
 
   // Accumulate by period.
   condensed.series['co2'] = new Array<number>(periodStarts.length - 1);
-  condensed.series['spend'] = new Array<number>(periodStarts.length - 1);
+  condensed.series['unmet'] = new Array<number>(periodStarts.length - 1);
   for (let i = 0; i < condensed.series['co2'].length; i++) {
     condensed.series['co2'][i] = 0;
-    condensed.series['spend'][i] = 0;
+    condensed.series['unmet'][i] = 0;
   }
   for (let source in profiles.series) {
     if (source == 'co2') continue;

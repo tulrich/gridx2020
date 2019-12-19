@@ -296,7 +296,6 @@ export const DEFAULT_PARAMETERS: ScenarioParameters = {
   lastYear: 2040,
   source: {
     solar: {
-      initialFraction: 0.02,
       ramp: [{
           buildFraction: 0.15,
           atYear: 2030,
@@ -304,6 +303,7 @@ export const DEFAULT_PARAMETERS: ScenarioParameters = {
           buildFraction: 0.35,
           atYear: 2040,
         }],
+      initialFraction: 0.02,
       buildTime: 1,
       buildCost: 1.0,
       operatingCost: 10.5,
@@ -321,9 +321,6 @@ export const DEFAULT_PARAMETERS: ScenarioParameters = {
       storageHours: 0,
     },
     wind: {
-      initialFraction: 0.04,
-      buildTime: 1,
-      buildCost: 1.3,
       ramp: [{
           buildFraction: 0.15,
           atYear: 2030,
@@ -331,6 +328,9 @@ export const DEFAULT_PARAMETERS: ScenarioParameters = {
           buildFraction: 0.45,
           atYear: 2040,
         }],
+      initialFraction: 0.04,
+      buildTime: 1,
+      buildCost: 1.3,
       operatingCost: 32,
       fuelCost: 0,
       costLearningRate: 0.15,
@@ -346,9 +346,6 @@ export const DEFAULT_PARAMETERS: ScenarioParameters = {
       storageHours: 0,
     },
     hydro: {
-      initialFraction: 0.08,
-      buildTime: 4,
-      buildCost: 2.95,
       ramp: [{
           buildFraction: 0.08,
           atYear: 2030,
@@ -356,6 +353,9 @@ export const DEFAULT_PARAMETERS: ScenarioParameters = {
           buildFraction: 0.08,
           atYear: 2040,
         }],
+      initialFraction: 0.08,
+      buildTime: 4,
+      buildCost: 2.95,
       operatingCost: 40.85,
       fuelCost: 1.36,
       costLearningRate: 0,
@@ -371,9 +371,6 @@ export const DEFAULT_PARAMETERS: ScenarioParameters = {
       storageHours: 0,
     },
     nuclear: {
-      initialFraction: 0.30,
-      buildTime: 6,
-      buildCost: 9.55,
       ramp: [{
           buildFraction: 0.30,
           atYear: 2030,
@@ -381,6 +378,9 @@ export const DEFAULT_PARAMETERS: ScenarioParameters = {
           buildFraction: 0.30,
           atYear: 2040,
         }],
+      initialFraction: 0.30,
+      buildTime: 6,
+      buildCost: 9.55,
       operatingCost: 120,
       fuelCost: 12,
       costLearningRate: 0.1,
@@ -398,9 +398,6 @@ export const DEFAULT_PARAMETERS: ScenarioParameters = {
       storageHours: 0,
     },
     ng: {
-      initialFraction: 1.40,
-      buildTime: 1,
-      buildCost: 0.825,
       ramp: [{
           buildFraction: 1.85,
           atYear: 2030,
@@ -408,6 +405,9 @@ export const DEFAULT_PARAMETERS: ScenarioParameters = {
           buildFraction: 2.65,
           atYear: 2040,
         }],
+      initialFraction: 1.40,
+      buildTime: 1,
+      buildCost: 0.825,
       operatingCost: 13.125,
       fuelCost: 36.2,
       costLearningRate: 0.05,
@@ -423,9 +423,6 @@ export const DEFAULT_PARAMETERS: ScenarioParameters = {
       storageHours: 0,
     },
     coal: {
-      initialFraction: 0.02,
-      buildTime: 5,
-      buildCost: 4.625,
       ramp: [{
           buildFraction: 0.0,
           atYear: 2025,
@@ -433,6 +430,9 @@ export const DEFAULT_PARAMETERS: ScenarioParameters = {
           buildFraction: 0.0,
           atYear: 2040,
         }],
+      initialFraction: 0.02,
+      buildTime: 5,
+      buildCost: 4.625,
       operatingCost: 61.1,
       fuelCost: 18.9,
       costLearningRate: 0.05,
@@ -448,7 +448,6 @@ export const DEFAULT_PARAMETERS: ScenarioParameters = {
       storageHours: 0,
     },
     battery: {
-      initialFraction: 0,
       ramp: [{
           buildFraction: 0,
           atYear: 2030,
@@ -456,6 +455,7 @@ export const DEFAULT_PARAMETERS: ScenarioParameters = {
           buildFraction: 0,
           atYear: 2040,
         }],
+      initialFraction: 0,
       buildTime: 1,
       buildCost: 1.26,
       operatingCost: 26.8,
@@ -473,7 +473,6 @@ export const DEFAULT_PARAMETERS: ScenarioParameters = {
       storageHours: 4,
     },
     h2: {
-      initialFraction: 0,
       ramp: [{
           buildFraction: 0,
           atYear: 2030,
@@ -481,6 +480,7 @@ export const DEFAULT_PARAMETERS: ScenarioParameters = {
           buildFraction: 0,
           atYear: 2040,
         }],
+      initialFraction: 0,
       buildTime: 2,
       buildCost: 2.08,
       operatingCost: 20,

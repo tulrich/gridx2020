@@ -33,7 +33,7 @@ limitations under the License.
   <header class="mdl-layout__header mdl-layout__header--scroll">
     <!-- <div class="mdl-layout-icon"></div> <!-- ? -->
     <div class="mdl-layout__header-row">
-      <span class="mdl-layout__title">Grid Transition</span>&nbsp(Beta)
+      <span class="mdl-layout__title">Grid Transition</span>&nbsp(0.90)
       <div class="mdl-layout-spacer"></div>
       <nav class="mdl-navigation">
         <a class="mdl-navigation__link model-link" href="">Model</a>
@@ -43,7 +43,7 @@ limitations under the License.
   </header>
 
   <div class="mdl-layout__drawer">
-    <span class="mdl-layout__title">Grid Transition&nbsp(Beta)</span>
+    <span class="mdl-layout__title">Grid Transition&nbsp(0.90)</span>
     <nav class="mdl-navigation">
       <a class="mdl-navigation__link model-link" href="">Model</a>
       <a class="mdl-navigation__link download-csv-link" href="">Download CSV (~10MB)</a>
@@ -635,11 +635,10 @@ limitations under the License.
             which are cheap and ramp fast but burn more gas per kWh
             than combined cycle.</li>
 
-          <li>Initial conditions are based on 2017 grid mix which
-            surely underestimates initial wind and solar. The model
-            also does not capture in detail current construction in
-            progress as of 2020, or the age of the existing fleet in
-            2020. This probably penalizes solar & wind scenarios
+          <li>Initial conditions are based on the ISO-NE grid mix but
+            the model does not capture in detail current construction
+            in progress as of 2020, or the age of the existing fleet
+            in 2020. This might penalize solar & wind scenarios
             somewhat.
           </li>
         </ul>
@@ -648,13 +647,15 @@ limitations under the License.
         <p>
           The demand profile
 	  is <a href="https://www.iso-ne.com/isoexpress/web/reports/load-and-demand/-/tree/zone-info">
-	    observed hourly data</a> from 6 years (2013-2018) of the
-	  New England electricity grid (ISO-NE), along with
+	  observed hourly data</a> from 6 years (2013-2018) of the New
+	  England electricity grid (ISO-NE), along with
 	  the <a href="https://www.iso-ne.com/isoexpress/web/reports/operations/-/tree/daily-gen-fuel-type">
-	    hourly solar and wind production</a> for the same
-	  hours. The profiles were preprocessed to normalize
-	  annual demand and solar/wind capacity (see
-	  inputdata/prepare.py).
+	  hourly solar and wind production</a> for the same hours. The
+	  profiles were preprocessed to normalize annual demand and
+	  solar/wind capacity (see inputdata/prepare.py), and then the
+	  initial grid mixes are set to approximate the
+	  ISO-NE <a href="https://www.iso-ne.com/isoexpress/web/reports/operations/-/tree/net-ener-peak-load">grid
+	  mix</a> for the first 11 months of 2019.
 	</p>
 
 	<p>

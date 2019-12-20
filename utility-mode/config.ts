@@ -145,6 +145,20 @@ export const END_TIMESTAMP = (new Date(Date.UTC(2040, 1 - 1, 15, 0, 0))).getTime
 //            38.6 * 7.5 = 290
 // Average them: 265Mt
 
+// NE-ISO 2019 grid mix, first 11 months
+// from https://www.iso-ne.com/isoexpress/web/reports/operations/-/tree/net-ener-peak-load
+//
+// coal 0.44
+// gas 48.30
+// hydro 8.95
+// nuclear 30.81
+// solar 1.77
+// wind 3.49
+// (refuse) 3.10
+// (wood) 2.48
+//
+// set initial fractions to approximate those values. Other sources
+// lumped into gas.
 
 // Build costs
 //
@@ -347,13 +361,13 @@ export const DEFAULT_PARAMETERS: ScenarioParameters = {
     },
     hydro: {
       ramp: [{
-          buildFraction: 0.08,
+          buildFraction: 0.10,
           atYear: 2030,
         }, {
-          buildFraction: 0.08,
+          buildFraction: 0.10,
           atYear: 2040,
         }],
-      initialFraction: 0.08,
+      initialFraction: 0.10,
       buildTime: 4,
       buildCost: 2.95,
       operatingCost: 40.85,
@@ -430,7 +444,7 @@ export const DEFAULT_PARAMETERS: ScenarioParameters = {
           buildFraction: 0.0,
           atYear: 2040,
         }],
-      initialFraction: 0.02,
+      initialFraction: 0.01,
       buildTime: 5,
       buildCost: 4.625,
       operatingCost: 61.1,
@@ -506,11 +520,11 @@ export const PRESET_ALLOCATIONS:
     {[K in UtilityPresetOption]: string} = {
   // Default.
   DEFAULT: "AiADCQcTAwkJEwIJAhMGCQYTJQk1EwAEABMACQATAAkAEw==",
-  RE: "AiAFCwcTEgYZCgIJAhMGCQYTKgkAEwAEABMBCQoTCAo/Ew==",
-  NUCLEAR: "AiAABAADFQcAEQIJAhMPBiUTIAUAEwAAABMJCAATBAQfEw==",
-  NO_H2: "Am8gGgABBwUNEwAKBQAoEh1iAhQHJAoADRAAKA8TXwQCCQITAx4UAxlBMWIPBgkGEwVgPBgjHidbRioJJxMACAdIHqsTXwEABAATBC4fJh7IJ18ACQlHEwAWEwAoChNiUAcAAAUAEwEVCgsoDhNfIC8=",
-  FLAT: "Am8gFAACABMAEwAKBQAoEh1iAgETABMADRAAKA8TXwQCCQITAx4UAxlBMWIPBgkGEwVgPBgjHidbRhwJHBMACAdIHqsTXwABEwATBC4fJh7IJ18AAAkAEwANDQAoChNiUAMAAAkAEwEVCgsoDhNfIC8=",
-  GAS: "AiAAAAATARMBEwIJAhMGCQYTKwk5EwATABMACQATAAkAEw==",
+  RE: "AiAFCwcTEQYZCwIJAhMGCQYTKgkAEwAEABMBCQoTCAo/Ew==",
+  NUCLEAR: "AiAABAADEwcAEQIJAhMPBiUTIAUAEwAAABMGCAATBAQfEw==",
+  NO_H2: "Am8gGgABBwUNEwAKBQAoEh1iAhQHJAoADRAAKA8TXwQCCQITAx4UAxlBMWIPBgkGEwVgPBgjHidbRioJJxMACAdIHqsTXwEABAATBC4fJh7IJ18ACgk+EwAaGgAoChNiUAcAAAUAEwEVCgsoDhNfIC8=", 
+  FLAT: "Am8gFAACABMAEwAKBQAoEh1iAgETABMADRAAKA8TXwQCCQITAx4UAxlBMWIPBgkGEwVgPBgjHidbRhwJHBMACAdIHqsTXwAABAATBC4fJh7IJ18AAAkAEwANDQAoChNiUAMAAAkAEwEVCgsoDhNfIC8=",
+  GAS: "AiAAAAATAQkBEwIJAhMGCQYTKwk5EwATABMACQATAAkAEw==",
 };
 
 // Categorization of energy sources by dispatch capability.

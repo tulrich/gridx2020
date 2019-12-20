@@ -22,7 +22,7 @@ export const CO2_EMISSIONS_GOAL = 265e6;  // <-- 2017 CO2 * 15 years / 2, i.e. l
 export const CO2_EMISSIONS_MAX = 1000e6;
 
 export const START_TIMESTAMP = (new Date(Date.UTC(2020, 1 - 1, 1, 0, 0))).getTime();
-export const END_TIMESTAMP = (new Date(Date.UTC(2040, 2 - 1, 15, 0, 0))).getTime();
+export const END_TIMESTAMP = (new Date(Date.UTC(2040, 1 - 1, 15, 0, 0))).getTime();
 
 // emissions goal: want a tick at 1.5C-compatible level.
 //

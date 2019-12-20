@@ -599,8 +599,22 @@ export class UtilityController implements SliderNotifee {
     for (let year in view.profiles.capacitySpend['solar']) {
       csv += (2020 + Number(year));
       sourceRowKeys.forEach(source => {
-          let spend = (view.profiles.capacitySpend[source][year] + view.profiles.capacitySpend[source][year]);
+          let spend = (view.profiles.capacitySpend[source][year] + view.profiles.operationSpend[source][year]);
           csv += ',' + d3.format('.0f')(spend);
+        });
+      csv += '\n';
+    }
+    csv += '\n';
+
+    // Annual capacity.
+    csv += 'year';
+    sourceRowKeys.forEach(source => { csv += ',' + source + ' MW'; });
+    csv += '\n';
+    for (let year in view.profiles.sourceCapacity['solar']) {
+      csv += (2020 + Number(year));
+      sourceRowKeys.forEach(source => {
+          let capacity = view.profiles.sourceCapacity[source][year];
+          csv += ',' + d3.format('.0f')(capacity);
         });
       csv += '\n';
     }
@@ -621,9 +635,9 @@ export class UtilityController implements SliderNotifee {
     csv += '\n';
 
     // Full profiles.
-    let profileKeys = getKeys(view.rawProfiles.series, []);
+    let profileKeys = getKeys(view.rawProfiles.series, ['co2']);
     csv += 'index,' + csvHeaderLine(profileKeys);
-    for (let i = 0; i < view.rawProfiles.series.demand.length && i < 100; i++) {
+    for (let i = 0; i < view.rawProfiles.series.demand.length; i++) {
       csv += i;
       profileKeys.forEach(key => {
 	  csv += ',' + d3.format('.0f')(view.rawProfiles.series[key][i]);

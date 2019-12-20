@@ -51,6 +51,7 @@ interface ProfileDataset {
 
   capacitySpend?: ProfileSeriesMap<number[]>;  // In $
   operationSpend?: ProfileSeriesMap<number[]>;  // In $
+  sourceCapacity?: ProfileSeriesMap<number[]>;  // In MW
   sourceSupply?: ProfileSeriesMap<number[]>;  // In MWh. Raw output, not including curtailment.
   sourceCo2?: ProfileSeriesMap<number[]>;  // In metric tons CO2
 

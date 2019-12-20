@@ -301,17 +301,20 @@ export function simulateGrid(
 
   // Build desired capacity according to the plans.
   let yearCount = params.lastYear - params.firstYear;
-  let sourceScale: ProfileSeriesMap<number[]> = {} as any;  // array indexed by (year - year0)
-  let capacitySpend: ProfileSeriesMap<number[]> = {} as any;  // array indexed by (year - year0)
-  let operationSpend: ProfileSeriesMap<number[]> = {} as any;  // array indexed by (year - year0)
-  let sourceCo2: ProfileSeriesMap<number[]> = {} as any;  // array indexed by (year - year0)
-  let sourceSupply: ProfileSeriesMap<number[]> = {} as any;  // array indexed by (year - year0)
+  // arrays indexed by (year - year0)
+  let sourceScale: ProfileSeriesMap<number[]> = {} as any;  // Scale factor to apply to normalized profiles.
+  let sourceCapacity: ProfileSeriesMap<number[]> = {} as any;  // Nameplate capacity in MW.
+  let capacitySpend: ProfileSeriesMap<number[]> = {} as any;  // Capacity spend by year.
+  let operationSpend: ProfileSeriesMap<number[]> = {} as any;  // Operation (incl fuel) spend, by year.
+  let sourceCo2: ProfileSeriesMap<number[]> = {} as any;  // CO2 emissions in metric tons, by year.
+  let sourceSupply: ProfileSeriesMap<number[]> = {} as any;  // MWh supplied, by year.
   config.ALL_ENERGY_SOURCES.forEach(source => {
       let p = params.source[source];
       let learningFactor = 1;
       let learningBase = p.initialFraction + p.costLearningBase;
       let cumulativeBuilt = learningBase;
       sourceScale[source] = [];
+      sourceCapacity[source] = [];
       capacitySpend[source] = [];
       operationSpend[source] = [];
       sourceCo2[source] = [];
@@ -400,11 +403,12 @@ export function simulateGrid(
   let sumMwh = 0;
   let sumCo2 = 0;
   for (let j = 0; j < scaledDemand.length; j += oneYear) {
+    let clampedYear = Math.min(year, yearCount - 1);
     let j1 = Math.min(scaledDemand.length, j + oneYear);
     // Update sources in place, for the coming year.
     for (let name in normalizedProfiles) {
       for (let i = j; i < j1; i++) {
-        normalizedProfiles[name][i] *= sourceScale[name][year];
+        normalizedProfiles[name][i] *= sourceScale[name][clampedYear];
       }
     }
     for (let i = j; i < j1; i++) {
@@ -488,22 +492,29 @@ export function simulateGrid(
         // Fuel cost this year.
         let profile = p.isDispatchable ? dispatchProfile[source] : normalizedProfiles[source];
         let mwh = d3.sum(profile.slice(j, j1));
-	sourceSupply[source][year] = mwh;
+	sourceSupply[source][clampedYear] += mwh;
         operationCost += mwh * p.fuelCost;
         // Capacity opex this year.
-        let capacityMw = sourceScale[source][year] * yearOneSourceCapacity[source];
+        let capacityMw = sourceScale[source][clampedYear] * yearOneSourceCapacity[source];
+	sourceCapacity[source][clampedYear] = capacityMw;
         // p.operatingCost is in $/KW_capacity/year
-        operationCost += capacityMw * 1e3 * p.operatingCost;
+	//
+	// The last year is just a bit of 2040; be careful not to pay for the whole year.
+	let yearFraction = (j1 - j) > 8000 ? 1.0 : (j1 - j) / oneYear;
+        operationCost += capacityMw * 1e3 * p.operatingCost * yearFraction;
         // Co2 emissions.
         let co2 = mwh * 1e3 * p.co2Intensity / 1e6;  // intensity in grams/kWh, output metric tons CO2
-	sourceCo2[source][year] = co2;
+	sourceCo2[source][clampedYear] += co2;
         // Carbon price.
         operationCost += co2 * params.carbonPrice;
 
-	operationSpend[source][year] = operationCost;
+	operationSpend[source][clampedYear] += operationCost;
 
         // Build cost this year.
-        let cost = operationCost + capacitySpend[source][year];
+        let cost = operationCost;
+	if (year == clampedYear) {
+	  cost += capacitySpend[source][clampedYear];
+	}
         sumDiscountedCost += cost * discountScale;
 
         sumCo2 += co2;
@@ -512,7 +523,7 @@ export function simulateGrid(
     sumDiscountedMwh += mwhThisYear * discountScale;
 
     // Increment year & scales.
-    year = Math.min(year + 1, yearCount - 1);
+    year++;
     demandScale *= (1 + params.demandGrowthRate);
     discountScale *= (1 - params.discountRate);
   }
@@ -544,22 +555,19 @@ export function simulateGrid(
       // Profile of total energy generation.
       supply: supplyProfile,
 
-      // Non-dispatchable energy supplied.
       solar: normalizedProfiles.solar,
       wind: normalizedProfiles.wind,
       hydro: normalizedProfiles.hydro,
       nuclear: normalizedProfiles.nuclear,
-      coal: normalizedProfiles.coal,
-
-      // Dispatchable-energy supplied.
       ng: dispatchProfile.ng,
-
+      coal: normalizedProfiles.coal,
       battery: dispatchProfile.battery,
       h2: dispatchProfile.h2,
       co2: zeroSeries,
     },
     capacitySpend: capacitySpend,
     operationSpend: operationSpend,
+    sourceCapacity: sourceCapacity,
     sourceSupply: sourceSupply,
     sourceCo2: sourceCo2,
     sumCo2: sumCo2,
@@ -641,6 +649,7 @@ export function condenseByPeriod(profiles: ProfileDataset, params: ScenarioParam
     series: {} as any,
     capacitySpend: profiles.capacitySpend,
     operationSpend: profiles.operationSpend,
+    sourceCapacity: profiles.sourceCapacity,
     sourceSupply: profiles.sourceSupply,
     sourceCo2: profiles.sourceCo2,
     sumDiscountedCost: profiles.sumDiscountedCost,

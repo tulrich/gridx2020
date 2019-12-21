@@ -253,7 +253,7 @@ export const END_TIMESTAMP = (new Date(Date.UTC(2040, 1 - 1, 15, 0, 0))).getTime
 //   Avg 5,700 $/KW; 60 $/KW/y; Fuel: 0.0150 $/kWh, var: 0.0035 $/KWh, sum 0.0185 $/kWh. 40 yr life.
 
 
-// Lazard cost numbers, v13, Nov 2019, from https://www.lazard.com/media/451086/lazards-levelized-cost-of-energy-version-130-vf.pdf
+// Lazard LCOE numbers, v13, Nov 2019, from https://www.lazard.com/media/451086/lazards-levelized-cost-of-energy-version-130-vf.pdf
 //
 // PV crystalline, utility-stale (100MW)
 //   1,100-900 $/KW; 12-9 $/KW/y; 9 mos; 30 years.
@@ -276,6 +276,10 @@ export const END_TIMESTAMP = (new Date(Date.UTC(2040, 1 - 1, 15, 0, 0))).getTime
 
 // Wind 5 year CAGR: 7%
 // PV 5 year CAGR: 13%
+
+// Lazard LCOS numbers, v5, Nov 2019, from https://www.lazard.com/media/451087/lazards-levelized-cost-of-storage-version-50-vf.pdf
+//   4h 100MW/400MWh wholesale, installed: 90-184 $, O&M 0.3-5 $/KWh, eff 91-70 %
+//   Avg 1.37 $/W; 10.6 $/KW/y; 350 days/y (96%), 20 y, eff 80.5 %.
 
 // Learning rates: https://www.mdpi.com/2071-1050/11/8/2310/pdf
 // * 1-factor (learn by doing) vs 2-factor (learn by doing + learn by searching (R&D))
@@ -471,14 +475,14 @@ export const DEFAULT_PARAMETERS: ScenarioParameters = {
         }],
       initialFraction: 0,
       buildTime: 1,
-      buildCost: 1.26,
-      operatingCost: 26.8,
+      buildCost: 1.37,
+      operatingCost: 10.6,
       fuelCost: 0,
       costLearningRate: 0.15,
-      costLearningBase: 0,
+      costLearningBase: 0.05,
       co2Intensity: 0,
       plantLifetime: 20,
-      maxCapacityFactor: 0.98,
+      maxCapacityFactor: 0.96,
       loadFollowPriority: 1,
 
       isDispatchable: true,
@@ -520,9 +524,9 @@ export const PRESET_ALLOCATIONS:
     {[K in UtilityPresetOption]: string} = {
   // Default.
   DEFAULT: "AiADCQcTAwkJEwIJAhMGCQYTJQk1EwAEABMACQATAAkAEw==",
-  RE: "AiAFCwcTEQYZCwIJAhMGCQYTKgkAEwAEABMBCQoTCAo/Ew==",
-  NUCLEAR: "AiAABAADEwcAEQIJAhMPBiUTIAUAEwAAABMGCAATBAQfEw==",
-  NO_H2: "Am8gGgABBwUNEwAKBQAoEh1iAhQHJAoADRAAKA8TXwQCCQITAx4UAxlBMWIPBgkGEwVgPBgjHidbRioJJxMACAdIHqsTXwEABAATBC4fJh7IJ18ACgk+EwAaGgAoChNiUAcAAAUAEwEVCgsoDhNfIC8=", 
+  RE: "AiAFCwcTEQYaCwIJAhMGCQYTKgkAEwAEABMBCQITCAo/Ew==",
+  NUCLEAR: "AiAABAADEwcAEQIJAhMPBiUTIAUAEwAAABMGCwATBAQfEw==",
+  NO_H2: "Am8gGgABBwULEwAKBQAoEh1iAhUGJg0ADRAAKA8TXwQCCQITAx4UAxlBMWIPBgkGEwVgPBgjHidbRioJJxMACAdIHqsTXwEABAATBC4fJh7IJ18ACgkfEwAbCwAoChNgUAcAAAUAEwEVCgsoDhNfIC8=",
   FLAT: "Am8gFAACABMAEwAKBQAoEh1iAgETABMADRAAKA8TXwQCCQITAx4UAxlBMWIPBgkGEwVgPBgjHidbRhwJHBMACAdIHqsTXwAABAATBC4fJh7IJ18AAAkAEwANDQAoChNiUAMAAAkAEwEVCgsoDhNfIC8=",
   GAS: "AiAAAAATAQkBEwIJAhMGCQYTKwk5EwATABMACQATAAkAEw==",
 };

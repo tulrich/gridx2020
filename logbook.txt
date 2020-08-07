@@ -4,6 +4,8 @@
 # clone the git repo
 git clone https://github.com/tulrich/gridx2020.git
 
+# install node.js via https://www.npmjs.com/get-npm
+
 # get deps
 npm install # update
 
@@ -12,6 +14,7 @@ npm run-script build
 npm run-script serve-watch
 
 # push to web
+npm run-script build
 rsync -Pvr dist/ tulrich@...:~/public_html/tulrich/gridx2020/
 
 # Hacks to material-design-lite

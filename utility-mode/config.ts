@@ -377,7 +377,7 @@ export const DEFAULT_PARAMETERS: ScenarioParameters = {
       operatingCost: 40.85,
       fuelCost: 1.36,
       costLearningRate: 0,
-      costLearningBase: 0,
+      costLearningBase: 1,
       co2Intensity: 31,
       plantLifetime: 50,
       maxCapacityFactor: 0.98,
@@ -504,7 +504,7 @@ export const DEFAULT_PARAMETERS: ScenarioParameters = {
       operatingCost: 20,
       fuelCost: 5.5,  // Includes membrane replacement of ~ $2.2/MWh / 40%
       costLearningRate: 0.15,
-      costLearningBase: 0,
+      costLearningBase: 0.05,
       co2Intensity: 4,
       plantLifetime: 20,
       maxCapacityFactor: 0.95,
